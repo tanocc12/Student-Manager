@@ -9,5 +9,8 @@ package DAL;
  * @author tans8
  */
 public class DBContext {
-    
+    String url = "jdbc:sqlserver://localhost\\SQLEXPRESS:1433;"
+        + "databaseName=StudentManagementDB;"
+        + "encrypt=false;"
+        + "trustServerCertificate=true;";
 }
