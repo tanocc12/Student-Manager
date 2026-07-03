@@ -1,17 +1,22 @@
-<%-- 
-    Document   : dashboard
-    Created on : Jul 1, 2026, 1:29:37 PM
-    Author     : tans8
---%>
-
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>JSP Page</title>
-    </head>
-    <body>
-        <h1>Hello World!</h1>
-    </body>
+<head>
+    <title>Admin Dashboard</title>
+</head>
+<body>
+
+    <h1>Admin Dashboard</h1>
+
+    <ul>
+        <li>Manage Students</li>
+        <li>Manage Courses</li>
+        <li>Manage Classes</li>
+        <li>Manage Enrollment</li>
+        <li>View Statistics</li>
+    </ul>
+
+    <a href="../home.jsp">Back to Home</a>
+
+</body>
 </html>
