@@ -61,7 +61,6 @@
                                     <option value="">-- Chọn vai trò --</option>
                                     <option value="student" ${param.role == 'student' ? 'selected' : ''}>Học sinh</option>
                                     <option value="teacher" ${param.role == 'teacher' ? 'selected' : ''}>Giáo viên</option>
-                                    <option value="admin" ${param.role == 'admin' ? 'selected' : ''}>Admin</option>
                                 </select>
                             </div>
 
