@@ -1,0 +1,115 @@
+/* Student Manager — shared UI (Bootstrap complement) */
+:root {
+  --sm-navy: #0b3a4a;
+  --sm-teal: #1fa8a0;
+}
+
+body.app-body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f3f7f8;
+}
+
+main.app-main {
+  flex: 1;
+  padding: 1.5rem 0 2.5rem;
+}
+
+.navbar-brand {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.navbar-sm {
+  background: linear-gradient(135deg, var(--sm-navy), #0f5466) !important;
+}
+
+.btn-teal {
+  background: var(--sm-teal);
+  border-color: var(--sm-teal);
+  color: #fff;
+  font-weight: 600;
+}
+
+.btn-teal:hover,
+.btn-teal:focus {
+  background: #178f88;
+  border-color: #178f88;
+  color: #fff;
+}
+
+.page-title {
+  color: var(--sm-navy);
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.page-subtitle {
+  color: #6c848c;
+  margin-bottom: 1.25rem;
+}
+
+.stat-card {
+  border: none;
+  border-radius: 0.9rem;
+  box-shadow: 0 6px 18px rgba(11, 58, 74, 0.08);
+}
+
+.stat-card .stat-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--sm-navy);
+}
+
+.menu-card {
+  border: none;
+  border-radius: 0.9rem;
+  box-shadow: 0 6px 18px rgba(11, 58, 74, 0.08);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  height: 100%;
+}
+
+.menu-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(11, 58, 74, 0.12);
+}
+
+.menu-card .card-title {
+  color: var(--sm-navy);
+  font-weight: 700;
+}
+
+.hero-home {
+  background: linear-gradient(135deg, var(--sm-navy), #0f5466);
+  color: #fff;
+  border-radius: 1rem;
+  padding: 2.5rem 2rem;
+  box-shadow: 0 12px 32px rgba(11, 58, 74, 0.18);
+}
+
+.hero-home h1 {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.table-card {
+  border: none;
+  border-radius: 0.9rem;
+  box-shadow: 0 6px 18px rgba(11, 58, 74, 0.08);
+  overflow: hidden;
+}
+
+.footer-sm {
+  background: #fff;
+  border-top: 1px solid #dce8eb;
+  color: #6c848c;
+  font-size: 0.9rem;
+  padding: 1rem 0;
+}
+
+.badge-role {
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 0.7rem;
+}
