@@ -13,8 +13,8 @@ public class DBContext {
             + "encrypt=false;"
             + "trustServerCertificate=true;";
 
-    private final String user = "sa";          // đổi nếu SQL của bạn không dùng sa
-    private final String password = "123456";  // đổi thành mật khẩu SQL Server của bạn
+    private final String user = "sa";          
+    private final String password = "123"; 
 
     public DBContext() {
 

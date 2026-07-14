@@ -7,10 +7,13 @@
             <file>file:/D:/FPTU/PRJ301/StudentManagement/src/java/Controller/CourseServlet.java</file>
             <file>file:/D:/FPTU/PRJ301/StudentManagement/web/login.jsp</file>
             <file>file:/D:/FPTU/PRJ301/StudentManagement/src/java/DAO/UserDAO.java</file>
+            <file>file:/D:/FPTU/PRJ301/StudentManagement/src/java/Models/Grade.java</file>
             <file>file:/D:/FPTU/PRJ301/StudentManagement/src/java/Controller/RegisterServlet.java</file>
+            <file>file:/D:/FPTU/PRJ301/StudentManagement/src/java/Models/User.java</file>
             <file>file:/D:/FPTU/PRJ301/StudentManagement/src/java/Controller/LoginServlet.java</file>
             <file>file:/D:/FPTU/PRJ301/StudentManagement/src/java/Controller/ClassServlet.java</file>
             <file>file:/D:/FPTU/PRJ301/StudentManagement/web/register.jsp</file>
+            <file>file:/D:/FPTU/PRJ301/StudentManagement/src/java/Models/ClassRoom.java</file>
         </group>
     </open-files>
 </project-private>
