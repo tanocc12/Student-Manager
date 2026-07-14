@@ -9,65 +9,69 @@ import java.sql.Types;
 
 public class UserDAO extends DBContext {
 
-    // Đăng ký tài khoản
+    // ========================= REGISTER =========================
     public boolean register(User user) {
 
         String sql = """
-            INSERT INTO Users
-            (Username, Email, Password, FullName, Gender, Dob, Phone, Role)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            """;
+                INSERT INTO Users
+                (Username, Email, Password, FullName, Gender, Dob, Phone, Role)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """;
 
         try {
 
+            if (connection == null) {
+                System.out.println("Connection is NULL!");
+                return false;
+            }
+
             PreparedStatement ps = connection.prepareStatement(sql);
 
-            // Username
             ps.setString(1, user.getUsername());
-
-            // Email
             ps.setString(2, user.getEmail());
-
-            // Password
             ps.setString(3, user.getPassword());
-
-            // FullName
             ps.setString(4, user.getFullName());
 
-            // Gender
             if (user.getGender() == null || user.getGender().isEmpty()) {
                 ps.setNull(5, Types.VARCHAR);
             } else {
                 ps.setString(5, user.getGender());
             }
 
-            // Date of Birth
             if (user.getDob() == null) {
                 ps.setNull(6, Types.DATE);
             } else {
                 ps.setDate(6, user.getDob());
             }
 
-            // Phone
             if (user.getPhone() == null || user.getPhone().isEmpty()) {
                 ps.setNull(7, Types.VARCHAR);
             } else {
                 ps.setString(7, user.getPhone());
             }
 
-            // Role
             ps.setString(8, user.getRole());
 
-            return ps.executeUpdate() > 0;
+            System.out.println("========== REGISTER ==========");
+            System.out.println("Username : " + user.getUsername());
+            System.out.println("Email    : " + user.getEmail());
+            System.out.println("Role     : " + user.getRole());
+
+            int row = ps.executeUpdate();
+
+            System.out.println("Rows Inserted = " + row);
+
+            return row > 0;
 
         } catch (Exception e) {
-            e.printStackTrace();
-        }
 
-        return false;
+            System.out.println("========== REGISTER ERROR ==========");
+            e.printStackTrace();
+            return false;
+        }
     }
 
-    // Kiểm tra Email đã tồn tại chưa
+    // ========================= CHECK EMAIL =========================
     public boolean checkEmail(String email) {
 
         String sql = "SELECT 1 FROM Users WHERE Email = ?";
@@ -83,13 +87,14 @@ public class UserDAO extends DBContext {
             return rs.next();
 
         } catch (Exception e) {
+
             e.printStackTrace();
         }
 
         return false;
     }
 
-    // Kiểm tra Username đã tồn tại chưa
+    // ========================= CHECK USERNAME =========================
     public boolean checkUsername(String username) {
 
         String sql = "SELECT 1 FROM Users WHERE Username = ?";
@@ -105,20 +110,22 @@ public class UserDAO extends DBContext {
             return rs.next();
 
         } catch (Exception e) {
+
             e.printStackTrace();
         }
 
         return false;
     }
 
+    // ========================= LOGIN =========================
     public User login(String username, String password) {
 
         String sql = """
-        SELECT *
-        FROM Users
-        WHERE Username = ?
-        AND Password = ?
-        """;
+                SELECT *
+                FROM Users
+                WHERE Username = ?
+                AND Password = ?
+                """;
 
         try {
 
@@ -147,9 +154,11 @@ public class UserDAO extends DBContext {
             }
 
         } catch (Exception e) {
+
             e.printStackTrace();
         }
 
         return null;
     }
+
 }
