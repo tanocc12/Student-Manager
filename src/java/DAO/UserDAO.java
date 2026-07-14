@@ -110,4 +110,46 @@ public class UserDAO extends DBContext {
 
         return false;
     }
+
+    public User login(String username, String password) {
+
+        String sql = """
+        SELECT *
+        FROM Users
+        WHERE Username = ?
+        AND Password = ?
+        """;
+
+        try {
+
+            PreparedStatement ps = connection.prepareStatement(sql);
+
+            ps.setString(1, username);
+            ps.setString(2, password);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+
+                User user = new User();
+
+                user.setId(rs.getInt("Id"));
+                user.setUsername(rs.getString("Username"));
+                user.setEmail(rs.getString("Email"));
+                user.setPassword(rs.getString("Password"));
+                user.setFullName(rs.getString("FullName"));
+                user.setGender(rs.getString("Gender"));
+                user.setDob(rs.getDate("Dob"));
+                user.setPhone(rs.getString("Phone"));
+                user.setRole(rs.getString("Role"));
+
+                return user;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
 }
