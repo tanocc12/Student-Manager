@@ -24,7 +24,7 @@
                     <a class="nav-link" href="${pageContext.request.contextPath}/home.jsp">Trang chủ</a>
                 </li>
 
-                <c:if test="${sessionScope.role == 'admin'}">
+                <c:if test="${sessionScope.user.role == 'Admin'}">
                     <li class="nav-item">
                         <a class="nav-link" href="${pageContext.request.contextPath}/admin/dashboard.jsp">Dashboard</a>
                     </li>
@@ -39,7 +39,7 @@
                     </li>
                 </c:if>
 
-                <c:if test="${sessionScope.role == 'teacher'}">
+                <c:if test="${sessionScope.user.role == 'Teacher'}">
                     <li class="nav-item">
                         <a class="nav-link" href="${pageContext.request.contextPath}/teacher/dashboard.jsp">Dashboard</a>
                     </li>
@@ -51,7 +51,7 @@
                     </li>
                 </c:if>
 
-                <c:if test="${sessionScope.role == 'student'}">
+                <c:if test="${sessionScope.user.role == 'Student'}">
                     <li class="nav-item">
                         <a class="nav-link" href="${pageContext.request.contextPath}/student/dashboard.jsp">Dashboard</a>
                     </li>
@@ -66,11 +66,11 @@
 
             <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
                 <c:choose>
-                    <c:when test="${not empty sessionScope.username}">
+                    <c:when test="${not empty sessionScope.user}">
                         <li class="nav-item">
                             <span class="navbar-text text-white-50 me-lg-2">
-                                Xin chào, <strong class="text-white">${sessionScope.fullName != null ? sessionScope.fullName : sessionScope.username}</strong>
-                                <span class="badge text-bg-light badge-role ms-1">${sessionScope.role}</span>
+                                Xin chào, <strong class="text-white">${sessionScope.user.fullName}</strong>
+                                <span class="badge text-bg-light badge-role ms-1">${sessionScope.user.role}</span>
                             </span>
                         </li>
                         <li class="nav-item">

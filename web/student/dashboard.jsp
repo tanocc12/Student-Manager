@@ -7,13 +7,6 @@
 <h2 class="page-title">Student Dashboard</h2>
 <p class="page-subtitle">Theo dõi khóa học và kết quả học tập của bạn.</p>
 
-<div class="mb-3">
-    <a href="${pageContext.request.contextPath}/LogoutServlet"
-       class="btn btn-danger">
-        Logout
-    </a>
-</div>
-
 <div class="row g-3">
     <div class="col-md-6">
         <div class="card menu-card">

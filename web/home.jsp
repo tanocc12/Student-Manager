@@ -14,12 +14,12 @@
         </div>
         <div class="col-lg-4 text-lg-end">
             <c:choose>
-                <c:when test="${not empty sessionScope.username}">
+                <c:when test="${not empty sessionScope.user}">
                     <c:choose>
-                        <c:when test="${sessionScope.role == 'admin'}">
+                        <c:when test="${sessionScope.user.role == 'Admin'}">
                             <a class="btn btn-light fw-semibold" href="${pageContext.request.contextPath}/admin/dashboard.jsp">Vào Dashboard</a>
                         </c:when>
-                        <c:when test="${sessionScope.role == 'teacher'}">
+                        <c:when test="${sessionScope.user.role == 'Teacher'}">
                             <a class="btn btn-light fw-semibold" href="${pageContext.request.contextPath}/teacher/dashboard.jsp">Vào Dashboard</a>
                         </c:when>
                         <c:otherwise>
