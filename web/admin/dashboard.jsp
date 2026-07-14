@@ -6,7 +6,6 @@
 
 <h2 class="page-title">Admin Dashboard</h2>
 <p class="page-subtitle">Tổng quan hệ thống quản lý học sinh.</p>
-
 <div class="row g-3 mb-4">
     <div class="col-6 col-lg-3">
         <div class="card stat-card">
