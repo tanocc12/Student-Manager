@@ -9,7 +9,7 @@ public class DBContext {
 
     private final String url =
             "jdbc:sqlserver://localhost\\SQLEXPRESS:1433;"
-            + "databaseName=StudentManagementDB;"
+            + "databaseName=StudentManager;"
             + "encrypt=false;"
             + "trustServerCertificate=true;";
 
