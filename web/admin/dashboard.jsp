@@ -7,6 +7,13 @@
 <h2 class="page-title">Admin Dashboard</h2>
 <p class="page-subtitle">Tổng quan hệ thống quản lý học sinh.</p>
 
+<div class="mb-3">
+    <a href="${pageContext.request.contextPath}/LogoutServlet"
+       class="btn btn-danger">
+        Logout
+    </a>
+</div>
+
 <div class="row g-3 mb-4">
     <div class="col-6 col-lg-3">
         <div class="card stat-card">

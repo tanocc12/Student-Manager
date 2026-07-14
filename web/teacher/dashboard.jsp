@@ -7,6 +7,13 @@
 <h2 class="page-title">Teacher Dashboard</h2>
 <p class="page-subtitle">Quản lý lớp phụ trách và điểm số học sinh.</p>
 
+<div class="mb-3">
+    <a href="${pageContext.request.contextPath}/LogoutServlet"
+       class="btn btn-danger">
+        Logout
+    </a>
+</div>
+
 <div class="row g-3">
     <div class="col-md-6">
         <div class="card menu-card">
