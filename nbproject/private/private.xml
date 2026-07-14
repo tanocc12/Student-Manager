@@ -3,16 +3,18 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/FPTU/PRJ301/StudentManagement/web/index.html</file>
+            <file>file:/D:/FPTU/PRJ301/StudentManagement/src/java/DAL/DBContext.java</file>
             <file>file:/D:/FPTU/PRJ301/StudentManagement/src/java/Controller/CourseServlet.java</file>
             <file>file:/D:/FPTU/PRJ301/StudentManagement/web/login.jsp</file>
             <file>file:/D:/FPTU/PRJ301/StudentManagement/src/java/DAO/UserDAO.java</file>
             <file>file:/D:/FPTU/PRJ301/StudentManagement/src/java/Models/Grade.java</file>
-            <file>file:/D:/FPTU/PRJ301/StudentManagement/src/java/Controller/RegisterServlet.java</file>
             <file>file:/D:/FPTU/PRJ301/StudentManagement/src/java/Models/User.java</file>
             <file>file:/D:/FPTU/PRJ301/StudentManagement/src/java/Controller/LoginServlet.java</file>
-            <file>file:/D:/FPTU/PRJ301/StudentManagement/src/java/Controller/ClassServlet.java</file>
             <file>file:/D:/FPTU/PRJ301/StudentManagement/web/register.jsp</file>
+            <file>file:/D:/FPTU/PRJ301/StudentManagement/src/java/DAL/TestDB.java</file>
+            <file>file:/D:/FPTU/PRJ301/StudentManagement/web/index.html</file>
+            <file>file:/D:/FPTU/PRJ301/StudentManagement/src/java/Controller/RegisterServlet.java</file>
+            <file>file:/D:/FPTU/PRJ301/StudentManagement/src/java/Controller/ClassServlet.java</file>
             <file>file:/D:/FPTU/PRJ301/StudentManagement/src/java/Models/ClassRoom.java</file>
         </group>
     </open-files>
