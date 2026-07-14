@@ -84,8 +84,8 @@
                                     <label for="role" class="form-label">Vai trò</label>
                                     <select class="form-select" id="role" name="role" required>
                                         <option value="">-- Chọn vai trò --</option>
-                                        <option value="student" ${param.role == 'Student' ? 'selected' : ''}>Học sinh</option>
-                                        <option value="teacher" ${param.role == 'Teacher' ? 'selected' : ''}>Giáo viên</option>r
+                                        <option value="Student" ${param.role == 'Student' ? 'selected' : ''}>Học sinh</option>
+                                        <option value="Teacher" ${param.role == 'Teacher' ? 'selected' : ''}>Giáo viên</option>r
                                     </select>
                                 </div>
 

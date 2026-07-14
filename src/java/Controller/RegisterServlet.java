@@ -89,7 +89,7 @@ public class RegisterServlet extends HttpServlet {
         if (dao.register(user)) {
 
             response.sendRedirect(request.getContextPath() + "/login.jsp");
-
+            
         } else {
 
             request.setAttribute("error", "Register failed.");

@@ -7,14 +7,14 @@ public class DBContext {
 
     protected Connection connection;
 
-    private final String url =
-            "jdbc:sqlserver://localhost\\SQLEXPRESS:1433;"
+    private final String url
+            = "jdbc:sqlserver://localhost\\SQLEXPRESS:1433;"
             + "databaseName=StudentManager;"
             + "encrypt=false;"
             + "trustServerCertificate=true;";
 
-    private final String user = "sa";          
-    private final String password = "123"; 
+    private final String user = "sa";
+    private final String password = "123";
 
     public DBContext() {
 
@@ -25,6 +25,8 @@ public class DBContext {
             connection = DriverManager.getConnection(url, user, password);
 
             System.out.println("Connected!");
+            System.out.println("Database = "
+                    + connection.getCatalog());
 
         } catch (Exception e) {
 
