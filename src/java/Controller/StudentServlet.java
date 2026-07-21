@@ -158,10 +158,10 @@ public class StudentServlet extends HttpServlet {
             throws ServletException, IOException {
 
         ClassDAO classDAO = new ClassDAO();
-        //DAO majorDAO = new MajorDAO();
+        DAO majorDAO = new MajorDAO();
 
-     //   request.setAttribute("classes", classDAO.getAllClasses());
-      //  request.setAttribute("majors", majorDAO.getAllMajors());
+        request.setAttribute("classes", classDAO.getAllClasses());
+        request.setAttribute("majors", majorDAO.getAllMajors());
 
         request.setAttribute("formAction", "insert");
 
@@ -196,6 +196,11 @@ public class StudentServlet extends HttpServlet {
             }
 
             request.setAttribute("student", student);
+            ClassDAO classDAO = new ClassDAO();
+            MajorDAO majorDAO = new MajorDAO();
+
+            request.setAttribute("classes", classDAO.getAllClasses());
+            request.setAttribute("majors", majorDAO.getAllMajors());
             request.setAttribute("formAction", "update");
 
             request.getRequestDispatcher(FORM_PAGE)
@@ -747,6 +752,11 @@ public class StudentServlet extends HttpServlet {
 
         request.setAttribute("student", student);
         request.setAttribute("error", message);
+        ClassDAO classDAO = new ClassDAO();
+        MajorDAO majorDAO = new MajorDAO();
+
+        request.setAttribute("classes", classDAO.getAllClasses());
+        request.setAttribute("majors", majorDAO.getAllMajors());
         request.setAttribute("formAction", "insert");
 
         request.getRequestDispatcher(FORM_PAGE)
