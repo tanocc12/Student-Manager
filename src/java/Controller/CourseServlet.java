@@ -10,35 +10,39 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
-@WebServlet("/course")
+@WebServlet(name = "CourseServlet", urlPatterns = {"/course"})
 public class CourseServlet extends HttpServlet {
 
     private CourseDAO courseDAO;
 
     @Override
-    public void init() {
+    public void init() throws ServletException {
         courseDAO = new CourseDAO();
     }
 
     @Override
-    protected void doGet(HttpServletRequest req,
+    protected void doGet(
+            HttpServletRequest req,
             HttpServletResponse resp)
             throws ServletException, IOException {
 
+        req.setCharacterEncoding("UTF-8");
+        resp.setCharacterEncoding("UTF-8");
+
         String action = req.getParameter("action");
 
-        if (action == null || action.isEmpty()) {
+        if (action == null || action.trim().isEmpty()) {
             action = "list";
         }
 
         switch (action) {
 
             case "add":
-                showCourseForm(req, resp);
+                showAddForm(req, resp);
                 break;
 
             case "edit":
-                showCourseForm(req, resp);
+                showEditForm(req, resp);
                 break;
 
             case "search":
@@ -53,14 +57,18 @@ public class CourseServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest req,
+    protected void doPost(
+            HttpServletRequest req,
             HttpServletResponse resp)
             throws ServletException, IOException {
 
+        req.setCharacterEncoding("UTF-8");
+        resp.setCharacterEncoding("UTF-8");
+
         String action = req.getParameter("action");
 
-        if (action == null) {
-            resp.sendRedirect("course");
+        if (action == null || action.trim().isEmpty()) {
+            redirectToList(req, resp);
             return;
         }
 
@@ -79,12 +87,13 @@ public class CourseServlet extends HttpServlet {
                 break;
 
             default:
-                resp.sendRedirect("course");
+                redirectToList(req, resp);
                 break;
         }
     }
 
-    private void listCourse(HttpServletRequest req,
+    private void listCourse(
+            HttpServletRequest req,
             HttpServletResponse resp)
             throws ServletException, IOException {
 
@@ -96,40 +105,52 @@ public class CourseServlet extends HttpServlet {
                 .forward(req, resp);
     }
 
-    private void showCourseForm(HttpServletRequest req,
+    private void showAddForm(
+            HttpServletRequest req,
             HttpServletResponse resp)
             throws ServletException, IOException {
 
-        int id = parseInt(req.getParameter("id"));
-
-        if (id > 0) {
-            Course course = courseDAO.getCourseById(id);
-
-            if (course == null) {
-                resp.sendRedirect("course");
-                return;
-            }
-
-            req.setAttribute("course", course);
-        }
+        req.setAttribute("formAction", "add");
 
         req.getRequestDispatcher("/admin/courses/form.jsp")
                 .forward(req, resp);
     }
 
-    private void searchCourse(HttpServletRequest req,
+    private void showEditForm(
+            HttpServletRequest req,
             HttpServletResponse resp)
             throws ServletException, IOException {
 
-        String keyword = req.getParameter("keyword");
+        int id = parseInt(req.getParameter("id"));
 
-        if (keyword == null) {
-            keyword = "";
+        if (id <= 0) {
+            redirectToList(req, resp);
+            return;
         }
 
-        keyword = keyword.trim();
+        Course course = courseDAO.getCourseById(id);
 
-        List<Course> courseList = courseDAO.searchCourse(keyword);
+        if (course == null) {
+            redirectToList(req, resp);
+            return;
+        }
+
+        req.setAttribute("course", course);
+        req.setAttribute("formAction", "edit");
+
+        req.getRequestDispatcher("/admin/courses/form.jsp")
+                .forward(req, resp);
+    }
+
+    private void searchCourse(
+            HttpServletRequest req,
+            HttpServletResponse resp)
+            throws ServletException, IOException {
+
+        String keyword = getTrimmedParameter(req, "keyword");
+
+        List<Course> courseList =
+                courseDAO.searchCourse(keyword);
 
         req.setAttribute("courseList", courseList);
         req.setAttribute("keyword", keyword);
@@ -138,82 +159,119 @@ public class CourseServlet extends HttpServlet {
                 .forward(req, resp);
     }
 
-    private void addCourse(HttpServletRequest req,
+    private void addCourse(
+            HttpServletRequest req,
             HttpServletResponse resp)
             throws ServletException, IOException {
 
-        String courseCode = req.getParameter("courseCode");
-        String courseName = req.getParameter("courseName");
-        int credits = parseInt(req.getParameter("credits"));
+        String courseCode =
+                getTrimmedParameter(req, "courseCode");
 
-        courseCode = courseCode == null ? "" : courseCode.trim();
-        courseName = courseName == null ? "" : courseName.trim();
+        String courseName =
+                getTrimmedParameter(req, "courseName");
 
-        if (courseCode.isEmpty()
-                || courseName.isEmpty()
-                || credits <= 0) {
+        int credits =
+                parseInt(req.getParameter("credits"));
 
-            req.setAttribute("error", "Please fill in all required fields.");
+        Course course = new Course(
+                0,
+                courseCode,
+                courseName,
+                credits
+        );
+
+        String error = validateCourse(course);
+
+        if (error != null) {
+            req.setAttribute("course", course);
+            req.setAttribute("formAction", "add");
+            req.setAttribute("error", error);
 
             req.getRequestDispatcher("/admin/courses/form.jsp")
                     .forward(req, resp);
+
             return;
         }
-
-        Course course = new Course(0, courseCode, courseName, credits);
 
         int result = courseDAO.createCourse(course);
 
         if (result > 0) {
-            resp.sendRedirect("course");
+            redirectToList(req, resp);
         } else {
-            req.setAttribute("error", "Add course failed.");
+            req.setAttribute("course", course);
+            req.setAttribute("formAction", "add");
+            req.setAttribute(
+                    "error",
+                    "Thêm môn học thất bại. Mã môn học có thể đã tồn tại."
+            );
+
             req.getRequestDispatcher("/admin/courses/form.jsp")
                     .forward(req, resp);
         }
     }
 
-    private void editCourse(HttpServletRequest req,
+    private void editCourse(
+            HttpServletRequest req,
             HttpServletResponse resp)
             throws ServletException, IOException {
 
         int id = parseInt(req.getParameter("id"));
 
-        String courseCode = req.getParameter("courseCode");
-        String courseName = req.getParameter("courseName");
-        int credits = parseInt(req.getParameter("credits"));
+        String courseCode =
+                getTrimmedParameter(req, "courseCode");
 
-        courseCode = courseCode == null ? "" : courseCode.trim();
-        courseName = courseName == null ? "" : courseName.trim();
+        String courseName =
+                getTrimmedParameter(req, "courseName");
 
-        if (id <= 0
-                || courseCode.isEmpty()
-                || courseName.isEmpty()
-                || credits <= 0) {
+        int credits =
+                parseInt(req.getParameter("credits"));
 
-            resp.sendRedirect("course");
+        Course course = new Course(
+                id,
+                courseCode,
+                courseName,
+                credits
+        );
+
+        if (id <= 0 || courseDAO.getCourseById(id) == null) {
+            redirectToList(req, resp);
             return;
         }
 
-        Course course = new Course(id, courseCode, courseName, credits);
+        String error = validateCourse(course);
+
+        if (error != null) {
+            req.setAttribute("course", course);
+            req.setAttribute("formAction", "edit");
+            req.setAttribute("error", error);
+
+            req.getRequestDispatcher("/admin/courses/form.jsp")
+                    .forward(req, resp);
+
+            return;
+        }
 
         int result = courseDAO.editCourse(course);
 
         if (result > 0) {
-            resp.sendRedirect("course");
+            redirectToList(req, resp);
         } else {
-
             req.setAttribute("course", course);
-            req.setAttribute("error", "Update failed.");
+            req.setAttribute("formAction", "edit");
+            req.setAttribute(
+                    "error",
+                    "Cập nhật môn học thất bại."
+            );
 
             req.getRequestDispatcher("/admin/courses/form.jsp")
                     .forward(req, resp);
         }
     }
 
-    private void deleteCourse(HttpServletRequest req,
+    private void deleteCourse(
+            HttpServletRequest req,
             HttpServletResponse resp)
-            throws ServletException, IOException {
+            throws IOException {
 
         int id = parseInt(req.getParameter("id"));
 
@@ -221,14 +279,71 @@ public class CourseServlet extends HttpServlet {
             courseDAO.deleteCourse(id);
         }
 
-        resp.sendRedirect("course");
+        redirectToList(req, resp);
+    }
+
+    private String validateCourse(Course course) {
+
+        if (course.getCourseCode() == null
+                || course.getCourseCode().trim().isEmpty()) {
+
+            return "Mã môn học không được để trống.";
+        }
+
+        if (course.getCourseName() == null
+                || course.getCourseName().trim().isEmpty()) {
+
+            return "Tên môn học không được để trống.";
+        }
+
+        if (course.getCourseCode().length() > 20) {
+            return "Mã môn học không được vượt quá 20 ký tự.";
+        }
+
+        if (course.getCourseName().length() > 100) {
+            return "Tên môn học không được vượt quá 100 ký tự.";
+        }
+
+        if (course.getCredits() <= 0) {
+            return "Số tín chỉ phải lớn hơn 0.";
+        }
+
+        return null;
+    }
+
+    private String getTrimmedParameter(
+            HttpServletRequest req,
+            String parameterName) {
+
+        String value = req.getParameter(parameterName);
+
+        if (value == null) {
+            return "";
+        }
+
+        return value.trim();
     }
 
     private int parseInt(String value) {
+
+        if (value == null || value.trim().isEmpty()) {
+            return 0;
+        }
+
         try {
-            return Integer.parseInt(value);
+            return Integer.parseInt(value.trim());
         } catch (NumberFormatException e) {
             return 0;
         }
+    }
+
+    private void redirectToList(
+            HttpServletRequest req,
+            HttpServletResponse resp)
+            throws IOException {
+
+        resp.sendRedirect(
+                req.getContextPath() + "/course?action=list"
+        );
     }
 }

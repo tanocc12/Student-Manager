@@ -17,8 +17,7 @@ public class CourseDAO extends DBContext {
                 + "FROM Courses "
                 + "ORDER BY Id";
 
-        try (PreparedStatement ps = connection.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 list.add(mapResultSetToCourse(rs));
@@ -161,4 +160,22 @@ public class CourseDAO extends DBContext {
         );
     }
 
+    public boolean checkCourseId(int id) {
+
+        String sql = "SELECT 1 FROM Courses WHERE Id = ?";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
 }
