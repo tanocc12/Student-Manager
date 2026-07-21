@@ -6,6 +6,9 @@ import Models.User;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Types;
+import java.util.ArrayList;
+import java.util.List;
+import java.sql.SQLException;
 
 public class UserDAO extends DBContext {
 
@@ -159,6 +162,52 @@ public class UserDAO extends DBContext {
         }
 
         return null;
+    }
+
+    public List<User> getAvailableStudentUsers() {
+
+        List<User> users = new ArrayList<>();
+
+        String sql = """
+                 SELECT u.Id,
+                        u.Username,
+                        u.Email,
+                        u.FullName,
+                        u.Gender,
+                        u.Dob,
+                        u.Phone,
+                        u.Role
+                 FROM Users u
+                 LEFT JOIN Students s
+                        ON u.Id = s.UserId
+                 WHERE u.Role = 'Student'
+                   AND s.Id IS NULL
+                 ORDER BY u.FullName
+                 """;
+
+        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+
+                User user = new User();
+
+                user.setId(rs.getInt("Id"));
+                user.setUsername(rs.getString("Username"));
+                user.setEmail(rs.getString("Email"));
+                user.setFullName(rs.getString("FullName"));
+                user.setGender(rs.getString("Gender"));
+                user.setDob(rs.getDate("Dob"));
+                user.setPhone(rs.getString("Phone"));
+                user.setRole(rs.getString("Role"));
+
+                users.add(user);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return users;
     }
 
 }

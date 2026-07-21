@@ -1,7 +1,9 @@
 package Controller;
 
 import DAO.ClassDAO;
+import DAO.MajorDAO;
 import DAO.StudentDAO;
+import DAO.UserDAO;
 import Models.Student;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -10,11 +12,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
-import java.sql.Date;
 import java.util.List;
-import DAO.MajorDAO;
 
-@WebServlet(name = "StudentServlet", urlPatterns = {"/StudentServlet"})
+@WebServlet(
+        name = "StudentServlet",
+        urlPatterns = {"/StudentServlet"}
+)
 public class StudentServlet extends HttpServlet {
 
     private static final String LIST_PAGE
@@ -39,6 +42,7 @@ public class StudentServlet extends HttpServlet {
         }
 
         switch (action) {
+
             case "list":
                 listStudents(request, response);
                 break;
@@ -56,10 +60,7 @@ public class StudentServlet extends HttpServlet {
                 break;
 
             default:
-                response.sendRedirect(
-                        request.getContextPath()
-                        + "/StudentServlet?action=list"
-                );
+                redirectToList(request, response);
                 break;
         }
     }
@@ -76,14 +77,12 @@ public class StudentServlet extends HttpServlet {
         String action = request.getParameter("action");
 
         if (action == null || action.trim().isEmpty()) {
-            response.sendRedirect(
-                    request.getContextPath()
-                    + "/StudentServlet?action=list"
-            );
+            redirectToList(request, response);
             return;
         }
 
         switch (action) {
+
             case "insert":
                 insertStudent(request, response);
                 break;
@@ -97,10 +96,7 @@ public class StudentServlet extends HttpServlet {
                 break;
 
             default:
-                response.sendRedirect(
-                        request.getContextPath()
-                        + "/StudentServlet?action=list"
-                );
+                redirectToList(request, response);
                 break;
         }
     }
@@ -113,8 +109,10 @@ public class StudentServlet extends HttpServlet {
             HttpServletResponse response)
             throws ServletException, IOException {
 
-        StudentDAO dao = new StudentDAO();
-        List<Student> students = dao.getAllStudents();
+        StudentDAO studentDAO = new StudentDAO();
+
+        List<Student> students
+                = studentDAO.getAllStudents();
 
         request.setAttribute("students", students);
 
@@ -125,25 +123,23 @@ public class StudentServlet extends HttpServlet {
     }
 
     /*
-     * Tìm kiếm theo mã, tên, email, username hoặc classCode.
+     * Tìm kiếm Student.
      */
     private void searchStudents(
             HttpServletRequest request,
             HttpServletResponse response)
             throws ServletException, IOException {
 
-        String keyword = request.getParameter("keyword");
+        String keyword
+                = getTrimmedParameter(request, "keyword");
 
-        if (keyword == null) {
-            keyword = "";
-        }
+        StudentDAO studentDAO = new StudentDAO();
 
-        StudentDAO dao = new StudentDAO();
         List<Student> students
-                = dao.searchStudents(keyword.trim());
+                = studentDAO.searchStudents(keyword);
 
         request.setAttribute("students", students);
-        request.setAttribute("keyword", keyword.trim());
+        request.setAttribute("keyword", keyword);
 
         loadFlashMessage(request);
 
@@ -152,18 +148,18 @@ public class StudentServlet extends HttpServlet {
     }
 
     /*
-     * Mở form thêm Student.
+     * Mở form tạo hồ sơ Student.
+     *
+     * availableUsers:
+     * Danh sách tài khoản có Role Student
+     * và chưa có hồ sơ trong bảng Students.
      */
     private void showCreateForm(
             HttpServletRequest request,
             HttpServletResponse response)
             throws ServletException, IOException {
 
-        ClassDAO classDAO = new ClassDAO();
-        MajorDAO majorDAO = new MajorDAO();
-
-        request.setAttribute("classes", classDAO.getAllClasses());
-        request.setAttribute("majors", majorDAO.getAllMajors());
+        loadCreateFormData(request);
 
         request.setAttribute("formAction", "insert");
 
@@ -172,20 +168,27 @@ public class StudentServlet extends HttpServlet {
     }
 
     /*
-     * Mở form sửa Student.
+     * Mở form cập nhật Student.
      */
     private void showEditForm(
             HttpServletRequest request,
             HttpServletResponse response)
             throws ServletException, IOException {
 
-        String idRaw = request.getParameter("id");
+        String idRaw
+                = getTrimmedParameter(request, "id");
 
         try {
             int id = Integer.parseInt(idRaw);
 
-            StudentDAO dao = new StudentDAO();
-            Student student = dao.getStudentById(id);
+            if (id <= 0) {
+                throw new NumberFormatException();
+            }
+
+            StudentDAO studentDAO = new StudentDAO();
+
+            Student student
+                    = studentDAO.getStudentById(id);
 
             if (student == null) {
                 setFlashError(
@@ -198,17 +201,19 @@ public class StudentServlet extends HttpServlet {
             }
 
             request.setAttribute("student", student);
-            ClassDAO classDAO = new ClassDAO();
-            MajorDAO majorDAO = new MajorDAO();
 
-            request.setAttribute("classes", classDAO.getAllClasses());
-            request.setAttribute("majors", majorDAO.getAllMajors());
-            request.setAttribute("formAction", "update");
+            loadUpdateFormData(request);
+
+            request.setAttribute(
+                    "formAction",
+                    "update"
+            );
 
             request.getRequestDispatcher(FORM_PAGE)
                     .forward(request, response);
 
         } catch (NumberFormatException e) {
+
             setFlashError(
                     request,
                     "ID học sinh không hợp lệ."
@@ -219,12 +224,12 @@ public class StudentServlet extends HttpServlet {
     }
 
     /*
-     * Thêm Student mới.
+     * Thêm hồ sơ Student.
      *
-     * StudentDAO sẽ:
-     * 1. INSERT Users
-     * 2. Lấy UserId
-     * 3. INSERT Students
+     * Không tạo Users.
+     * Không nhập password.
+     *
+     * User đã được tạo từ Register trước đó.
      */
     private void insertStudent(
             HttpServletRequest request,
@@ -234,60 +239,30 @@ public class StudentServlet extends HttpServlet {
         Student student;
 
         try {
-            student = getStudentFromRequest(request, false);
+            student = getStudentFromRequest(
+                    request,
+                    false
+            );
 
         } catch (IllegalArgumentException e) {
-            request.setAttribute("error", e.getMessage());
-            request.setAttribute("formAction", "insert");
 
-            request.getRequestDispatcher(FORM_PAGE)
-                    .forward(request, response);
-            return;
-        }
-
-        String password = getTrimmedParameter(
-                request,
-                "password"
-        );
-
-        String confirmPassword = getTrimmedParameter(
-                request,
-                "confirmPassword"
-        );
-
-        if (password.isEmpty()) {
             forwardCreateError(
                     request,
                     response,
-                    student,
-                    "Mật khẩu không được để trống."
+                    null,
+                    e.getMessage()
             );
             return;
         }
 
-        if (password.length() < 6) {
-            forwardCreateError(
-                    request,
-                    response,
-                    student,
-                    "Mật khẩu phải có ít nhất 6 ký tự."
-            );
-            return;
-        }
+        StudentDAO studentDAO = new StudentDAO();
 
-        if (!password.equals(confirmPassword)) {
-            forwardCreateError(
-                    request,
-                    response,
-                    student,
-                    "Xác nhận mật khẩu không khớp."
-            );
-            return;
-        }
+        /*
+         * Kiểm tra mã Student đã tồn tại.
+         */
+        if (studentDAO.checkStudentCode(
+                student.getStudentCode())) {
 
-        StudentDAO dao = new StudentDAO();
-
-        if (dao.checkStudentCode(student.getStudentCode())) {
             forwardCreateError(
                     request,
                     response,
@@ -297,29 +272,31 @@ public class StudentServlet extends HttpServlet {
             return;
         }
 
-        if (dao.checkUsername(student.getUsername())) {
+        /*
+         * Kiểm tra tài khoản có phải:
+         * - Role Student
+         * - Chưa có hồ sơ Student
+         */
+        if (!studentDAO.checkAvailableStudentUser(
+                student.getUserId())) {
+
             forwardCreateError(
                     request,
                     response,
                     student,
-                    "Tên đăng nhập đã tồn tại."
+                    "Tài khoản không hợp lệ hoặc đã có hồ sơ học sinh."
             );
             return;
         }
 
-        if (dao.checkEmail(student.getEmail())) {
-            forwardCreateError(
-                    request,
-                    response,
-                    student,
-                    "Email đã tồn tại."
-            );
-            return;
-        }
-
+        /*
+         * Kiểm tra Major tồn tại.
+         */
         MajorDAO majorDAO = new MajorDAO();
 
-        if (!majorDAO.checkMajorId(student.getMajorId())) {
+        if (!majorDAO.checkMajorId(
+                student.getMajorId())) {
+
             forwardCreateError(
                     request,
                     response,
@@ -329,32 +306,66 @@ public class StudentServlet extends HttpServlet {
             return;
         }
 
-        boolean inserted = dao.insertStudent(
-                student,
-                password
-        );
+        /*
+         * Kiểm tra Class tồn tại.
+         */
+        ClassDAO classDAO = new ClassDAO();
+
+        if (!classDAO.checkClassId(
+                student.getClassId())) {
+
+            forwardCreateError(
+                    request,
+                    response,
+                    student,
+                    "Lớp học không tồn tại."
+            );
+            return;
+        }
+
+        /*
+         * Kiểm tra Class thuộc Major.
+         */
+        if (!classDAO.checkClassBelongsToMajor(
+                student.getClassId(),
+                student.getMajorId())) {
+
+            forwardCreateError(
+                    request,
+                    response,
+                    student,
+                    "Lớp học không thuộc chuyên ngành đã chọn."
+            );
+            return;
+        }
+
+        boolean inserted
+                = studentDAO.insertStudent(student);
 
         if (inserted) {
+
             setFlashSuccess(
                     request,
-                    "Thêm học sinh thành công."
+                    "Thêm hồ sơ học sinh thành công."
             );
 
             redirectToList(request, response);
 
         } else {
+
             forwardCreateError(
                     request,
                     response,
                     student,
-                    "Thêm học sinh thất bại. "
-                    + "Vui lòng kiểm tra lại dữ liệu."
+                    "Thêm hồ sơ học sinh thất bại."
             );
         }
     }
 
     /*
-     * Cập nhật Student.
+     * Cập nhật hồ sơ Student.
+     *
+     * Không cập nhật username, email hoặc password.
      */
     private void updateStudent(
             HttpServletRequest request,
@@ -364,23 +375,31 @@ public class StudentServlet extends HttpServlet {
         Student student;
 
         try {
-            student = getStudentFromRequest(request, true);
+            student = getStudentFromRequest(
+                    request,
+                    true
+            );
 
         } catch (IllegalArgumentException e) {
-            request.setAttribute("error", e.getMessage());
-            request.setAttribute("formAction", "update");
 
-            request.getRequestDispatcher(FORM_PAGE)
-                    .forward(request, response);
+            forwardUpdateError(
+                    request,
+                    response,
+                    null,
+                    e.getMessage()
+            );
             return;
         }
 
-        StudentDAO dao = new StudentDAO();
+        StudentDAO studentDAO = new StudentDAO();
 
         Student oldStudent
-                = dao.getStudentById(student.getId());
+                = studentDAO.getStudentById(
+                        student.getId()
+                );
 
         if (oldStudent == null) {
+
             setFlashError(
                     request,
                     "Không tìm thấy học sinh cần cập nhật."
@@ -391,12 +410,45 @@ public class StudentServlet extends HttpServlet {
         }
 
         /*
-         * UserId không nên lấy trực tiếp từ form vì có thể bị sửa.
-         * Lấy UserId thật từ database.
+         * Không lấy UserId từ form khi update.
+         * Giữ UserId thật đang có trong database.
          */
-        student.setUserId(oldStudent.getUserId());
+        student.setUserId(
+                oldStudent.getUserId()
+        );
 
-        if (dao.checkStudentCodeExceptId(
+        /*
+         * Giữ thông tin User để khi forward lại
+         * form vẫn có thể hiển thị.
+         */
+        student.setUsername(
+                oldStudent.getUsername()
+        );
+
+        student.setFullName(
+                oldStudent.getFullName()
+        );
+
+        student.setEmail(
+                oldStudent.getEmail()
+        );
+
+        student.setGender(
+                oldStudent.getGender()
+        );
+
+        student.setDob(
+                oldStudent.getDob()
+        );
+
+        student.setPhone(
+                oldStudent.getPhone()
+        );
+
+        /*
+         * Kiểm tra StudentCode trùng với Student khác.
+         */
+        if (studentDAO.checkStudentCodeExceptId(
                 student.getStudentCode(),
                 student.getId())) {
 
@@ -409,35 +461,11 @@ public class StudentServlet extends HttpServlet {
             return;
         }
 
-        if (dao.checkUsernameExceptUserId(
-                student.getUsername(),
-                student.getUserId())) {
-
-            forwardUpdateError(
-                    request,
-                    response,
-                    student,
-                    "Tên đăng nhập đã tồn tại."
-            );
-            return;
-        }
-
-        if (dao.checkEmailExceptUserId(
-                student.getEmail(),
-                student.getUserId())) {
-
-            forwardUpdateError(
-                    request,
-                    response,
-                    student,
-                    "Email đã tồn tại."
-            );
-            return;
-        }
-
         MajorDAO majorDAO = new MajorDAO();
 
-        if (!majorDAO.checkMajorId(student.getMajorId())) {
+        if (!majorDAO.checkMajorId(
+                student.getMajorId())) {
+
             forwardUpdateError(
                     request,
                     response,
@@ -447,9 +475,38 @@ public class StudentServlet extends HttpServlet {
             return;
         }
 
-        boolean updated = dao.updateStudent(student);
+        ClassDAO classDAO = new ClassDAO();
+
+        if (!classDAO.checkClassId(
+                student.getClassId())) {
+
+            forwardUpdateError(
+                    request,
+                    response,
+                    student,
+                    "Lớp học không tồn tại."
+            );
+            return;
+        }
+
+        if (!classDAO.checkClassBelongsToMajor(
+                student.getClassId(),
+                student.getMajorId())) {
+
+            forwardUpdateError(
+                    request,
+                    response,
+                    student,
+                    "Lớp học không thuộc chuyên ngành đã chọn."
+            );
+            return;
+        }
+
+        boolean updated
+                = studentDAO.updateStudent(student);
 
         if (!updated) {
+
             forwardUpdateError(
                     request,
                     response,
@@ -457,69 +514,6 @@ public class StudentServlet extends HttpServlet {
                     "Cập nhật học sinh thất bại."
             );
             return;
-        }
-
-        /*
-         * Password là tùy chọn khi update.
-         * Để trống thì giữ mật khẩu cũ.
-         */
-        String newPassword = getTrimmedParameter(
-                request,
-                "password"
-        );
-
-        String confirmPassword = getTrimmedParameter(
-                request,
-                "confirmPassword"
-        );
-
-        if (!newPassword.isEmpty()) {
-
-            if (newPassword.length() < 6) {
-                /*
-                 * Thông tin đã update trước đó.
-                 * Để transaction tuyệt đối thì nên đưa update password
-                 * vào chung StudentDAO.updateStudent.
-                 *
-                 * Bản hiện tại coi password là bước riêng.
-                 */
-                setFlashError(
-                        request,
-                        "Thông tin đã cập nhật, nhưng mật khẩu "
-                        + "phải có ít nhất 6 ký tự."
-                );
-
-                redirectToList(request, response);
-                return;
-            }
-
-            if (!newPassword.equals(confirmPassword)) {
-                setFlashError(
-                        request,
-                        "Thông tin đã cập nhật, nhưng xác nhận "
-                        + "mật khẩu không khớp."
-                );
-
-                redirectToList(request, response);
-                return;
-            }
-
-            boolean passwordUpdated
-                    = dao.updateStudentPassword(
-                            student.getUserId(),
-                            newPassword
-                    );
-
-            if (!passwordUpdated) {
-                setFlashError(
-                        request,
-                        "Thông tin đã cập nhật, nhưng không thể "
-                        + "cập nhật mật khẩu."
-                );
-
-                redirectToList(request, response);
-                return;
-            }
         }
 
         setFlashSuccess(
@@ -531,34 +525,49 @@ public class StudentServlet extends HttpServlet {
     }
 
     /*
-     * Xóa Student.
+     * Xóa hồ sơ Student.
+     *
+     * StudentDAO mới chỉ xóa hồ sơ Student,
+     * không xóa tài khoản Users.
      */
     private void deleteStudent(
             HttpServletRequest request,
             HttpServletResponse response)
             throws IOException {
 
-        String idRaw = request.getParameter("id");
+        String idRaw
+                = getTrimmedParameter(request, "id");
 
         try {
             int id = Integer.parseInt(idRaw);
 
-            StudentDAO dao = new StudentDAO();
-            boolean deleted = dao.deleteStudent(id);
+            if (id <= 0) {
+                throw new NumberFormatException();
+            }
+
+            StudentDAO studentDAO
+                    = new StudentDAO();
+
+            boolean deleted
+                    = studentDAO.deleteStudent(id);
 
             if (deleted) {
+
                 setFlashSuccess(
                         request,
-                        "Xóa học sinh thành công."
+                        "Xóa hồ sơ học sinh thành công."
                 );
+
             } else {
+
                 setFlashError(
                         request,
-                        "Không thể xóa học sinh."
+                        "Không thể xóa hồ sơ học sinh."
                 );
             }
 
         } catch (NumberFormatException e) {
+
             setFlashError(
                     request,
                     "ID học sinh không hợp lệ."
@@ -569,13 +578,14 @@ public class StudentServlet extends HttpServlet {
     }
 
     /*
-     * Đọc dữ liệu từ form và tạo Student.
+     * Đọc dữ liệu Student từ form.
      *
-     * isUpdate = false:
-     * - Không cần đọc id.
+     * Khi create:
+     * - Đọc userId.
      *
-     * isUpdate = true:
-     * - Bắt buộc phải có id.
+     * Khi update:
+     * - Đọc id.
+     * - Không đọc userId từ form.
      */
     private Student getStudentFromRequest(
             HttpServletRequest request,
@@ -583,126 +593,106 @@ public class StudentServlet extends HttpServlet {
 
         Student student = new Student();
 
+        /*
+         * Update cần Students.Id.
+         */
         if (isUpdate) {
-            String idRaw = getTrimmedParameter(
-                    request,
-                    "id"
-            );
+
+            String idRaw
+                    = getTrimmedParameter(
+                            request,
+                            "id"
+                    );
 
             try {
-                student.setId(Integer.parseInt(idRaw));
+                int id = Integer.parseInt(idRaw);
+
+                if (id <= 0) {
+                    throw new NumberFormatException();
+                }
+
+                student.setId(id);
+
             } catch (NumberFormatException e) {
+
                 throw new IllegalArgumentException(
                         "ID học sinh không hợp lệ."
                 );
             }
         }
 
-        String studentCode = getTrimmedParameter(
-                request,
-                "studentCode"
-        );
+        /*
+         * Create cần chọn User đã đăng ký.
+         */
+        if (!isUpdate) {
 
-        String username = getTrimmedParameter(
-                request,
-                "username"
-        );
+            String userIdRaw
+                    = getTrimmedParameter(
+                            request,
+                            "userId"
+                    );
 
-        String fullName = getTrimmedParameter(
-                request,
-                "fullName"
-        );
+            try {
+                int userId
+                        = Integer.parseInt(userIdRaw);
 
-        String email = getTrimmedParameter(
-                request,
-                "email"
-        );
+                if (userId <= 0) {
+                    throw new NumberFormatException();
+                }
 
-        String gender = getTrimmedParameter(
-                request,
-                "gender"
-        );
+                student.setUserId(userId);
 
-        String dobRaw = getTrimmedParameter(
-                request,
-                "dob"
-        );
+            } catch (NumberFormatException e) {
 
-        String phone = getTrimmedParameter(
-                request,
-                "phone"
-        );
+                throw new IllegalArgumentException(
+                        "Tài khoản sinh viên không hợp lệ."
+                );
+            }
+        }
 
-        String classIdRaw = getTrimmedParameter(
-                request,
-                "classId"
-        );
+        String studentCode
+                = getTrimmedParameter(
+                        request,
+                        "studentCode"
+                );
 
-        String majorIdRaw = getTrimmedParameter(
-                request,
-                "majorId"
-        );
+        String classIdRaw
+                = getTrimmedParameter(
+                        request,
+                        "classId"
+                );
 
-        String address = getTrimmedParameter(
-                request,
-                "address"
-        );
+        String majorIdRaw
+                = getTrimmedParameter(
+                        request,
+                        "majorId"
+                );
 
-        String status = getTrimmedParameter(
-                request,
-                "status"
-        );
+        String address
+                = getTrimmedParameter(
+                        request,
+                        "address"
+                );
 
+        String status
+                = getTrimmedParameter(
+                        request,
+                        "status"
+                );
+
+        /*
+         * Validate StudentCode.
+         */
         if (studentCode.isEmpty()) {
+
             throw new IllegalArgumentException(
                     "Mã học sinh không được để trống."
             );
         }
 
-        if (username.isEmpty()) {
-            throw new IllegalArgumentException(
-                    "Tên đăng nhập không được để trống."
-            );
-        }
-
-        if (fullName.isEmpty()) {
-            throw new IllegalArgumentException(
-                    "Họ tên không được để trống."
-            );
-        }
-
-        if (email.isEmpty()) {
-            throw new IllegalArgumentException(
-                    "Email không được để trống."
-            );
-        }
-
-        if (!email.matches(
-                "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
-
-            throw new IllegalArgumentException(
-                    "Email không đúng định dạng."
-            );
-        }
-
-        if (!gender.isEmpty()
-                && !gender.equals("Male")
-                && !gender.equals("Female")) {
-
-            throw new IllegalArgumentException(
-                    "Giới tính phải là Male hoặc Female."
-            );
-        }
-
-        if (!status.equals("Studying")
-                && !status.equals("Graduated")
-                && !status.equals("Dropped")) {
-
-            throw new IllegalArgumentException(
-                    "Trạng thái học sinh không hợp lệ."
-            );
-        }
-
+        /*
+         * Validate ClassId.
+         */
         int classId;
 
         try {
@@ -713,11 +703,15 @@ public class StudentServlet extends HttpServlet {
             }
 
         } catch (NumberFormatException e) {
+
             throw new IllegalArgumentException(
                     "Lớp học không hợp lệ."
             );
         }
 
+        /*
+         * Validate MajorId.
+         */
         int majorId;
 
         try {
@@ -728,46 +722,41 @@ public class StudentServlet extends HttpServlet {
             }
 
         } catch (NumberFormatException e) {
+
             throw new IllegalArgumentException(
                     "Chuyên ngành không hợp lệ."
             );
         }
 
-        Date dob = null;
+        /*
+         * Validate Status.
+         */
+        if (!status.equals("Studying")
+                && !status.equals("Graduated")
+                && !status.equals("Dropped")) {
 
-        if (!dobRaw.isEmpty()) {
-            try {
-                dob = Date.valueOf(dobRaw);
-            } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException(
-                        "Ngày sinh không hợp lệ."
-                );
-            }
+            throw new IllegalArgumentException(
+                    "Trạng thái học sinh không hợp lệ."
+            );
         }
 
         student.setStudentCode(studentCode);
-        student.setUsername(username);
-        student.setFullName(fullName);
-        student.setEmail(email);
-        student.setGender(
-                gender.isEmpty() ? null : gender
-        );
-        student.setDob(dob);
-        student.setPhone(
-                phone.isEmpty() ? null : phone
-        );
         student.setClassId(classId);
         student.setMajorId(majorId);
+
         student.setAddress(
-                address.isEmpty() ? null : address
+                address.isEmpty()
+                        ? null
+                        : address
         );
+
         student.setStatus(status);
 
         return student;
     }
 
     /*
-     * Forward lại form create khi lỗi.
+     * Forward lại form create khi có lỗi.
      */
     private void forwardCreateError(
             HttpServletRequest request,
@@ -778,19 +767,16 @@ public class StudentServlet extends HttpServlet {
 
         request.setAttribute("student", student);
         request.setAttribute("error", message);
-        ClassDAO classDAO = new ClassDAO();
-        MajorDAO majorDAO = new MajorDAO();
-
-        request.setAttribute("classes", classDAO.getAllClasses());
-        request.setAttribute("majors", majorDAO.getAllMajors());
         request.setAttribute("formAction", "insert");
+
+        loadCreateFormData(request);
 
         request.getRequestDispatcher(FORM_PAGE)
                 .forward(request, response);
     }
 
     /*
-     * Forward lại form update khi lỗi.
+     * Forward lại form update khi có lỗi.
      */
     private void forwardUpdateError(
             HttpServletRequest request,
@@ -801,33 +787,80 @@ public class StudentServlet extends HttpServlet {
 
         request.setAttribute("student", student);
         request.setAttribute("error", message);
-
-        ClassDAO classDAO = new ClassDAO();
-        MajorDAO majorDAO = new MajorDAO();
-
-        request.setAttribute("classes", classDAO.getAllClasses());
-        request.setAttribute("majors", majorDAO.getAllMajors());
-
         request.setAttribute("formAction", "update");
+
+        loadUpdateFormData(request);
 
         request.getRequestDispatcher(FORM_PAGE)
                 .forward(request, response);
     }
 
     /*
-     * Đọc parameter và loại bỏ khoảng trắng hai đầu.
+     * Load dữ liệu cho form create.
+     */
+    private void loadCreateFormData(
+            HttpServletRequest request) {
+
+        ClassDAO classDAO = new ClassDAO();
+        MajorDAO majorDAO = new MajorDAO();
+        UserDAO userDAO = new UserDAO();
+
+        request.setAttribute(
+                "classes",
+                classDAO.getAllClasses()
+        );
+
+        request.setAttribute(
+                "majors",
+                majorDAO.getAllMajors()
+        );
+
+        request.setAttribute(
+                "availableUsers",
+                userDAO.getAvailableStudentUsers()
+        );
+    }
+
+    /*
+     * Load dữ liệu cho form update.
+     *
+     * Update không cần danh sách availableUsers
+     * vì không được đổi tài khoản của Student.
+     */
+    private void loadUpdateFormData(
+            HttpServletRequest request) {
+
+        ClassDAO classDAO = new ClassDAO();
+        MajorDAO majorDAO = new MajorDAO();
+
+        request.setAttribute(
+                "classes",
+                classDAO.getAllClasses()
+        );
+
+        request.setAttribute(
+                "majors",
+                majorDAO.getAllMajors()
+        );
+    }
+
+    /*
+     * Lấy parameter và xóa khoảng trắng hai đầu.
      */
     private String getTrimmedParameter(
             HttpServletRequest request,
             String parameterName) {
 
-        String value = request.getParameter(parameterName);
+        String value
+                = request.getParameter(parameterName);
 
-        return value == null ? "" : value.trim();
+        return value == null
+                ? ""
+                : value.trim();
     }
 
     /*
-     * Flash message dùng session.
+     * Lưu thông báo thành công vào session.
      */
     private void setFlashSuccess(
             HttpServletRequest request,
@@ -839,6 +872,9 @@ public class StudentServlet extends HttpServlet {
         );
     }
 
+    /*
+     * Lưu thông báo lỗi vào session.
+     */
     private void setFlashError(
             HttpServletRequest request,
             String message) {
@@ -850,8 +886,8 @@ public class StudentServlet extends HttpServlet {
     }
 
     /*
-     * Chuyển flash message từ session sang request,
-     * sau đó xóa khỏi session.
+     * Chuyển flash message từ session
+     * sang request rồi xóa khỏi session.
      */
     private void loadFlashMessage(
             HttpServletRequest request) {
@@ -864,32 +900,42 @@ public class StudentServlet extends HttpServlet {
         }
 
         Object success
-                = session.getAttribute("flashSuccess");
+                = session.getAttribute(
+                        "flashSuccess"
+                );
 
         Object error
-                = session.getAttribute("flashError");
+                = session.getAttribute(
+                        "flashError"
+                );
 
         if (success != null) {
+
             request.setAttribute(
                     "success",
                     success.toString()
             );
 
-            session.removeAttribute("flashSuccess");
+            session.removeAttribute(
+                    "flashSuccess"
+            );
         }
 
         if (error != null) {
+
             request.setAttribute(
                     "error",
                     error.toString()
             );
 
-            session.removeAttribute("flashError");
+            session.removeAttribute(
+                    "flashError"
+            );
         }
     }
 
     /*
-     * Redirect về danh sách.
+     * Redirect về trang danh sách.
      */
     private void redirectToList(
             HttpServletRequest request,

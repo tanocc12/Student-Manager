@@ -6,19 +6,34 @@
                value="Form học sinh | Student Manager"/>
 </jsp:include>
 
-<c:set var="isEdit" value="${not empty student}"/>
+<%-- 
+    Không dùng: ${not empty student}
+    Vì khi thêm thất bại, Servlet cũng gửi student về form.
+
+    Chỉ xem là edit khi formAction = update.
+--%>
+<c:set var="isEdit"
+       value="${formAction == 'update'}"/>
 
 <h2 class="page-title">
-    ${isEdit ? 'Sửa học sinh' : 'Thêm học sinh'}
+    ${isEdit ? 'Sửa hồ sơ học sinh' : 'Thêm hồ sơ học sinh'}
 </h2>
 
 <p class="page-subtitle">
-    Nhập đầy đủ thông tin học sinh.
+    <c:choose>
+        <c:when test="${isEdit}">
+            Cập nhật thông tin học tập của học sinh.
+        </c:when>
+
+        <c:otherwise>
+            Chọn tài khoản sinh viên đã đăng ký và nhập thông tin học tập.
+        </c:otherwise>
+    </c:choose>
 </p>
 
 <c:if test="${not empty error}">
     <div class="alert alert-danger">
-        ${error}
+        <c:out value="${error}"/>
     </div>
 </c:if>
 
@@ -29,19 +44,139 @@
               action="${pageContext.request.contextPath}/StudentServlet"
               class="row g-3">
 
+            <%-- Action insert hoặc update --%>
             <input type="hidden"
                    name="action"
                    value="${isEdit ? 'update' : 'insert'}">
 
+            <%-- Khi update phải gửi Student.Id --%>
             <c:if test="${isEdit}">
                 <input type="hidden"
                        name="id"
                        value="${student.id}">
             </c:if>
 
-            <!-- Mã học sinh -->
+            <%-- ==========================================
+                 CREATE: Chọn tài khoản đã đăng ký
+                 ========================================== --%>
+            <c:if test="${not isEdit}">
+
+                <div class="col-12">
+                    <label class="form-label"
+                           for="userId">
+                        Tài khoản sinh viên
+                    </label>
+
+                    <select class="form-select"
+                            id="userId"
+                            name="userId"
+                            required>
+
+                        <option value="">
+                            -- Chọn tài khoản đã đăng ký --
+                        </option>
+
+                        <c:forEach var="u"
+                                   items="${availableUsers}">
+
+                            <option value="${u.id}"
+                                    ${student.userId == u.id
+                                      ? 'selected' : ''}>
+
+                                <c:out value="${u.fullName}"/>
+                                -
+                                <c:out value="${u.username}"/>
+                                -
+                                <c:out value="${u.email}"/>
+                            </option>
+
+                        </c:forEach>
+                    </select>
+
+                    <div class="form-text">
+                        Chỉ hiển thị tài khoản có vai trò Student
+                        và chưa có hồ sơ học sinh.
+                    </div>
+                </div>
+
+                <%-- Không còn tài khoản phù hợp --%>
+                <c:if test="${empty availableUsers}">
+                    <div class="col-12">
+                        <div class="alert alert-warning mb-0">
+                            Hiện không có tài khoản Student nào
+                            chưa được tạo hồ sơ.
+
+                            Sinh viên cần đăng ký tài khoản trước
+                            khi Admin thêm hồ sơ.
+                        </div>
+                    </div>
+                </c:if>
+
+            </c:if>
+
+            <%-- ==========================================
+                 UPDATE: Hiển thị tài khoản hiện tại
+                 ========================================== --%>
+            <c:if test="${isEdit}">
+
+                <div class="col-md-6">
+                    <label class="form-label">
+                        Tên đăng nhập
+                    </label>
+
+                    <input type="text"
+                           class="form-control"
+                           value="${student.username}"
+                           readonly>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">
+                        Họ và tên
+                    </label>
+
+                    <input type="text"
+                           class="form-control"
+                           value="${student.fullName}"
+                           readonly>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">
+                        Email
+                    </label>
+
+                    <input type="email"
+                           class="form-control"
+                           value="${student.email}"
+                           readonly>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">
+                        Số điện thoại
+                    </label>
+
+                    <input type="text"
+                           class="form-control"
+                           value="${student.phone}"
+                           readonly>
+                </div>
+
+                <div class="col-12">
+                    <div class="form-text">
+                        Thông tin tài khoản được quản lý riêng,
+                        không thay đổi tại form học sinh.
+                    </div>
+                </div>
+
+            </c:if>
+
+            <%-- Mã học sinh --%>
             <div class="col-md-6">
-                <label class="form-label" for="studentCode">
+
+                <label class="form-label"
+                       for="studentCode">
                     Mã học sinh
                 </label>
 
@@ -51,127 +186,14 @@
                        name="studentCode"
                        required
                        value="${student.studentCode}">
+
             </div>
 
-            <!-- Username -->
+            <%-- Chuyên ngành --%>
             <div class="col-md-6">
-                <label class="form-label" for="username">
-                    Tên đăng nhập
-                </label>
 
-                <input type="text"
-                       class="form-control"
-                       id="username"
-                       name="username"
-                       required
-                       value="${student.username}">
-            </div>
-
-            <!-- Họ tên -->
-            <div class="col-md-6">
-                <label class="form-label" for="fullName">
-                    Họ và tên
-                </label>
-
-                <input type="text"
-                       class="form-control"
-                       id="fullName"
-                       name="fullName"
-                       required
-                       value="${student.fullName}">
-            </div>
-
-            <!-- Email -->
-            <div class="col-md-6">
-                <label class="form-label" for="email">
-                    Email
-                </label>
-
-                <input type="email"
-                       class="form-control"
-                       id="email"
-                       name="email"
-                       required
-                       value="${student.email}">
-            </div>
-
-            <!-- Giới tính -->
-            <div class="col-md-6">
-                <label class="form-label" for="gender">
-                    Giới tính
-                </label>
-
-                <select class="form-select"
-                        id="gender"
-                        name="gender">
-
-                    <option value="">-- Chọn giới tính --</option>
-
-                    <option value="Male"
-                            ${student.gender == 'Male' ? 'selected' : ''}>
-                        Nam
-                    </option>
-
-                    <option value="Female"
-                            ${student.gender == 'Female' ? 'selected' : ''}>
-                        Nữ
-                    </option>
-                </select>
-            </div>
-
-            <!-- Ngày sinh -->
-            <div class="col-md-6">
-                <label class="form-label" for="dob">
-                    Ngày sinh
-                </label>
-
-                <input type="date"
-                       class="form-control"
-                       id="dob"
-                       name="dob"
-                       value="${student.dob}">
-            </div>
-
-            <!-- Số điện thoại -->
-            <div class="col-md-6">
-                <label class="form-label" for="phone">
-                    Số điện thoại
-                </label>
-
-                <input type="text"
-                       class="form-control"
-                       id="phone"
-                       name="phone"
-                       value="${student.phone}">
-            </div>
-
-            <!-- Lớp -->
-            <div class="col-md-6">
-                <label class="form-label" for="classId">
-                    Lớp
-                </label>
-
-                <select class="form-select"
-                        id="classId"
-                        name="classId"
-                        required>
-
-                    <option value="">-- Chọn lớp --</option>
-
-                    <c:forEach var="cl" items="${classes}">
-                        <option value="${cl.id}"
-                                ${student.classId == cl.id
-                                  ? 'selected' : ''}>
-
-                            ${cl.classCode} - ${cl.className}
-                        </option>
-                    </c:forEach>
-                </select>
-            </div>
-
-            <!-- Chuyên ngành -->
-            <div class="col-md-6">
-                <label class="form-label" for="majorId">
+                <label class="form-label"
+                       for="majorId">
                     Chuyên ngành
                 </label>
 
@@ -184,33 +206,66 @@
                         -- Chọn chuyên ngành --
                     </option>
 
-                    <c:forEach var="m" items="${majors}">
+                    <c:forEach var="m"
+                               items="${majors}">
+
                         <option value="${m.id}"
                                 ${student.majorId == m.id
                                   ? 'selected' : ''}>
 
-                            ${m.majorCode} - ${m.majorName}
+                            <c:out value="${m.majorCode}"/>
+                            -
+                            <c:out value="${m.majorName}"/>
                         </option>
+
                     </c:forEach>
                 </select>
+
             </div>
 
-            <!-- Địa chỉ -->
+            <%-- Lớp --%>
             <div class="col-md-6">
-                <label class="form-label" for="address">
-                    Địa chỉ
+
+                <label class="form-label"
+                       for="classId">
+                    Lớp
                 </label>
 
-                <input type="text"
-                       class="form-control"
-                       id="address"
-                       name="address"
-                       value="${student.address}">
+                <select class="form-select"
+                        id="classId"
+                        name="classId"
+                        required>
+
+                    <option value="">
+                        -- Chọn lớp --
+                    </option>
+
+                    <c:forEach var="cl"
+                               items="${classes}">
+
+                        <option value="${cl.id}"
+                                ${student.classId == cl.id
+                                  ? 'selected' : ''}>
+
+                            <c:out value="${cl.classCode}"/>
+                            -
+                            <c:out value="${cl.className}"/>
+                        </option>
+
+                    </c:forEach>
+                </select>
+
+                <div class="form-text">
+                    Lớp phải thuộc chuyên ngành đã chọn.
+                </div>
+
             </div>
 
-            <!-- Trạng thái -->
+            <%-- Trạng thái --%>
             <div class="col-md-6">
-                <label class="form-label" for="status">
+
+                <label class="form-label"
+                       for="status">
                     Trạng thái
                 </label>
 
@@ -219,7 +274,9 @@
                         name="status"
                         required>
 
-                    <option value="">-- Chọn trạng thái --</option>
+                    <option value="">
+                        -- Chọn trạng thái --
+                    </option>
 
                     <option value="Studying"
                             ${student.status == 'Studying'
@@ -238,46 +295,36 @@
                               ? 'selected' : ''}>
                         Đã nghỉ học
                     </option>
+
                 </select>
+
             </div>
 
-            <!-- Mật khẩu -->
-            <div class="col-md-6">
-                <label class="form-label" for="password">
-                    ${isEdit ? 'Mật khẩu mới' : 'Mật khẩu'}
+            <%-- Địa chỉ --%>
+            <div class="col-12">
+
+                <label class="form-label"
+                       for="address">
+                    Địa chỉ
                 </label>
 
-                <input type="password"
+                <input type="text"
                        class="form-control"
-                       id="password"
-                       name="password"
-                       ${isEdit ? '' : 'required'}>
+                       id="address"
+                       name="address"
+                       value="${student.address}">
 
-                <c:if test="${isEdit}">
-                    <div class="form-text">
-                        Để trống nếu không muốn đổi mật khẩu.
-                    </div>
-                </c:if>
             </div>
 
-            <!-- Xác nhận mật khẩu -->
-            <div class="col-md-6">
-                <label class="form-label" for="confirmPassword">
-                    Xác nhận mật khẩu
-                </label>
-
-                <input type="password"
-                       class="form-control"
-                       id="confirmPassword"
-                       name="confirmPassword"
-                       ${isEdit ? '' : 'required'}>
-            </div>
-
-            <!-- Buttons -->
+            <%-- Buttons --%>
             <div class="col-12 d-flex gap-2">
 
                 <button type="submit"
-                        class="btn btn-teal">
+                        class="btn btn-teal"
+                        <c:if test="${not isEdit and empty availableUsers}">
+                            disabled
+                        </c:if>>
+
                     ${isEdit ? 'Cập nhật' : 'Thêm học sinh'}
                 </button>
 
@@ -285,6 +332,7 @@
                    href="${pageContext.request.contextPath}/StudentServlet?action=list">
                     Hủy
                 </a>
+
             </div>
 
         </form>
