@@ -1,5 +1,6 @@
 package Controllers;
 
+import DAO.ClassDAO;
 import DAO.StudentDAO;
 import Models.Student;
 import jakarta.servlet.ServletException;
@@ -157,10 +158,10 @@ public class StudentServlet extends HttpServlet {
             throws ServletException, IOException {
 
         ClassDAO classDAO = new ClassDAO();
-        MajorDAO majorDAO = new MajorDAO();
+        //DAO majorDAO = new MajorDAO();
 
-        request.setAttribute("classes", classDAO.getAllClasses());
-        request.setAttribute("majors", majorDAO.getAllMajors());
+     //   request.setAttribute("classes", classDAO.getAllClasses());
+      //  request.setAttribute("majors", majorDAO.getAllMajors());
 
         request.setAttribute("formAction", "insert");
 
