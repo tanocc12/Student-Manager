@@ -9,7 +9,10 @@
         <h2 class="page-title mb-0">Quản lý học sinh</h2>
         <p class="page-subtitle mb-0">Danh sách · tìm kiếm · CRUD</p>
     </div>
-    <a class="btn btn-teal" href="${pageContext.request.contextPath}/admin/students/form.jsp">+ Thêm học sinh</a>
+    <a class="btn btn-teal"
+       href="${pageContext.request.contextPath}/StudentServlet?action=create">
+        + Thêm học sinh
+    </a>
 </div>
 
 <div class="card table-card mb-3">
@@ -23,19 +26,26 @@
             </div>
             <div class="col-md-4 d-grid d-md-flex gap-2">
                 <button type="submit" class="btn btn-outline-secondary flex-fill">Tìm kiếm</button>
-                <a class="btn btn-light flex-fill" href="${pageContext.request.contextPath}/admin/students/list.jsp">Reset</a>
+                <a class="btn btn-light flex-fill"
+                   href="${pageContext.request.contextPath}/StudentServlet?action=list">
+                    Reset
+                </a>
             </div>
         </form>
     </div>
 </div>
 
-<% if (request.getAttribute("error") != null) { %>
-<div class="alert alert-danger"><%= request.getAttribute("error") %></div>
-<% } %>
-<% if (request.getAttribute("success") != null) { %>
-<div class="alert alert-success"><%= request.getAttribute("success") %></div>
-<% } %>
+<c:if test="${not empty error}">
+    <div class="alert alert-danger">
+        ${error}
+    </div>
+</c:if>
 
+<c:if test="${not empty success}">
+    <div class="alert alert-success">
+        ${success}
+    </div>
+</c:if>
 <div class="card table-card">
     <div class="table-responsive">
         <table class="table table-hover align-middle mb-0">
@@ -53,48 +63,28 @@
                     <c:when test="${not empty students}">
                         <c:forEach var="s" items="${students}">
                             <tr>
-                                <td>${s.studentId}</td>
+                                <td>${s.studentCode}</td>
                                 <td>${s.fullName}</td>
                                 <td>${s.email}</td>
                                 <td>${s.className}</td>
                                 <td class="text-end">
                                     <a class="btn btn-sm btn-outline-primary"
-                                       href="${pageContext.request.contextPath}/admin/students/form.jsp?id=${s.studentId}">Sửa</a>
+                                       href="${pageContext.request.contextPath}/StudentServlet?action=edit&id=${s.id}">Sửa</a>
                                     <form class="d-inline" method="post"
                                           action="${pageContext.request.contextPath}/StudentServlet"
                                           onsubmit="return confirm('Xóa học sinh này?');">
                                         <input type="hidden" name="action" value="delete">
-                                        <input type="hidden" name="id" value="${s.studentId}">
+                                        <input type="hidden" name="id" value="${s.id}">
                                         <button type="submit" class="btn btn-sm btn-outline-danger">Xóa</button>
                                     </form>
                                 </td>
                             </tr>
                         </c:forEach>
-                    </c:when>
+                    </c:when> 
                     <c:otherwise>
                         <tr>
-                            <td>SV001</td>
-                            <td>Nguyễn Văn A</td>
-                            <td>a@example.com</td>
-                            <td>SE1801</td>
-                            <td class="text-end">
-                                <a class="btn btn-sm btn-outline-primary" href="${pageContext.request.contextPath}/admin/students/form.jsp?id=1">Sửa</a>
-                                <button type="button" class="btn btn-sm btn-outline-danger" disabled>Xóa</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>SV002</td>
-                            <td>Trần Thị B</td>
-                            <td>b@example.com</td>
-                            <td>SE1801</td>
-                            <td class="text-end">
-                                <a class="btn btn-sm btn-outline-primary" href="${pageContext.request.contextPath}/admin/students/form.jsp?id=2">Sửa</a>
-                                <button type="button" class="btn btn-sm btn-outline-danger" disabled>Xóa</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="5" class="text-muted small">
-                                * Dữ liệu mẫu UI. Backend set <code>students</code> vào request để hiển thị thật.
+                            <td colspan="5" class="text-center text-muted py-4">
+                                Không tìm thấy học sinh nào.
                             </td>
                         </tr>
                     </c:otherwise>
