@@ -152,10 +152,15 @@ public class StudentServlet extends HttpServlet {
     /*
      * Mở form thêm Student.
      */
-    private void showCreateForm(
-            HttpServletRequest request,
+    private void showCreateForm(HttpServletRequest request,
             HttpServletResponse response)
             throws ServletException, IOException {
+
+        ClassDAO classDAO = new ClassDAO();
+        MajorDAO majorDAO = new MajorDAO();
+
+        request.setAttribute("classes", classDAO.getAllClasses());
+        request.setAttribute("majors", majorDAO.getAllMajors());
 
         request.setAttribute("formAction", "insert");
 
