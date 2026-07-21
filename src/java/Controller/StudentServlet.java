@@ -1,4 +1,4 @@
-package Controllers;
+package Controller;
 
 import DAO.ClassDAO;
 import DAO.StudentDAO;
@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.Date;
 import java.util.List;
+import DAO.MajorDAO;
 
 @WebServlet(name = "StudentServlet", urlPatterns = {"/StudentServlet"})
 public class StudentServlet extends HttpServlet {
@@ -153,12 +154,13 @@ public class StudentServlet extends HttpServlet {
     /*
      * Mở form thêm Student.
      */
-    private void showCreateForm(HttpServletRequest request,
+    private void showCreateForm(
+            HttpServletRequest request,
             HttpServletResponse response)
             throws ServletException, IOException {
 
         ClassDAO classDAO = new ClassDAO();
-        DAO majorDAO = new MajorDAO();
+        MajorDAO majorDAO = new MajorDAO();
 
         request.setAttribute("classes", classDAO.getAllClasses());
         request.setAttribute("majors", majorDAO.getAllMajors());
@@ -315,6 +317,18 @@ public class StudentServlet extends HttpServlet {
             return;
         }
 
+        MajorDAO majorDAO = new MajorDAO();
+
+        if (!majorDAO.checkMajorId(student.getMajorId())) {
+            forwardCreateError(
+                    request,
+                    response,
+                    student,
+                    "Chuyên ngành không tồn tại."
+            );
+            return;
+        }
+
         boolean inserted = dao.insertStudent(
                 student,
                 password
@@ -417,6 +431,18 @@ public class StudentServlet extends HttpServlet {
                     response,
                     student,
                     "Email đã tồn tại."
+            );
+            return;
+        }
+
+        MajorDAO majorDAO = new MajorDAO();
+
+        if (!majorDAO.checkMajorId(student.getMajorId())) {
+            forwardUpdateError(
+                    request,
+                    response,
+                    student,
+                    "Chuyên ngành không tồn tại."
             );
             return;
         }
@@ -775,6 +801,13 @@ public class StudentServlet extends HttpServlet {
 
         request.setAttribute("student", student);
         request.setAttribute("error", message);
+
+        ClassDAO classDAO = new ClassDAO();
+        MajorDAO majorDAO = new MajorDAO();
+
+        request.setAttribute("classes", classDAO.getAllClasses());
+        request.setAttribute("majors", majorDAO.getAllMajors());
+
         request.setAttribute("formAction", "update");
 
         request.getRequestDispatcher(FORM_PAGE)
