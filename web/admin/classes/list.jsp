@@ -106,7 +106,7 @@
                                     </a>
 
                                     <a
-                                        href="${pageContext.request.contextPath}/ClassServlet?action=delete&id=${cl.classId}"
+                                        href="${pageContext.request.contextPath}/ClassServlet?action=delete&id=${cl.id}"
                                         class="btn btn-sm btn-outline-danger"
                                         onclick="return confirm('Bạn có chắc muốn xóa lớp này?');">
 
