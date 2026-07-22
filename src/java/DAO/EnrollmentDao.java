@@ -44,8 +44,7 @@ public class EnrollmentDAO extends DBContext {
                 + "ORDER BY e.Id DESC";
 
         try (
-                PreparedStatement ps = connection.prepareStatement(sql);
-                ResultSet rs = ps.executeQuery()) {
+                PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 list.add(mapEnrollment(rs));

@@ -3,24 +3,34 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/FPTU/PRJ301/StudentManagement/web/admin/dashboard.jsp</file>
+            <file>file:/D:/FPTU/PRJ301/StudentManagement/src/java/DAL/DBContext.java</file>
             <file>file:/D:/FPTU/PRJ301/StudentManagement/src/java/Controller/CourseServlet.java</file>
-            <file>file:/D:/FPTU/PRJ301/StudentManagement/web/login.jsp</file>
             <file>file:/D:/FPTU/PRJ301/StudentManagement/src/java/DAO/ClassDAO.java</file>
-            <file>file:/D:/FPTU/PRJ301/StudentManagement/src/java/Models/Student.java</file>
-            <file>file:/D:/FPTU/PRJ301/StudentManagement/web/error.jsp</file>
+            <file>file:/D:/FPTU/PRJ301/StudentManagement/src/java/Models/Grade.java</file>
             <file>file:/D:/FPTU/PRJ301/StudentManagement/src/java/Controller/StudentServlet.java</file>
-            <file>file:/D:/FPTU/PRJ301/StudentManagement/src/java/DAO/StudentDAO.java</file>
+            <file>file:/D:/FPTU/PRJ301/StudentManagement/src/java/Controller/LoginServlet.java</file>
             <file>file:/D:/FPTU/PRJ301/StudentManagement/web/register.jsp</file>
             <file>file:/D:/FPTU/PRJ301/StudentManagement/web/student/courses.jsp</file>
-            <file>file:/D:/FPTU/PRJ301/StudentManagement/src/java/Models/Course.java</file>
             <file>file:/D:/FPTU/PRJ301/StudentManagement/web/admin/courses/form.jsp</file>
-            <file>file:/D:/FPTU/PRJ301/StudentManagement/web/home.jsp</file>
+            <file>file:/D:/FPTU/PRJ301/StudentManagement/src/java/Models/Major.java</file>
             <file>file:/D:/FPTU/PRJ301/StudentManagement/web/admin/classes/list.jsp</file>
+            <file>file:/D:/FPTU/PRJ301/StudentManagement/src/java/Models/ClassRoom.java</file>
+            <file>file:/D:/FPTU/PRJ301/StudentManagement/web/admin/dashboard.jsp</file>
+            <file>file:/D:/FPTU/PRJ301/StudentManagement/web/layout/header.jsp</file>
+            <file>file:/D:/FPTU/PRJ301/StudentManagement/web/login.jsp</file>
+            <file>file:/D:/FPTU/PRJ301/StudentManagement/src/java/Models/Student.java</file>
+            <file>file:/D:/FPTU/PRJ301/StudentManagement/web/error.jsp</file>
+            <file>file:/D:/FPTU/PRJ301/StudentManagement/src/java/DAO/StudentDAO.java</file>
+            <file>file:/D:/FPTU/PRJ301/StudentManagement/src/java/Models/Teacher.java</file>
+            <file>file:/D:/FPTU/PRJ301/StudentManagement/src/java/Models/Course.java</file>
+            <file>file:/D:/FPTU/PRJ301/StudentManagement/web/home.jsp</file>
+            <file>file:/D:/FPTU/PRJ301/StudentManagement/src/java/Models/Enrollment.java</file>
+            <file>file:/D:/FPTU/PRJ301/StudentManagement/src/java/DAO/EnrollmentDAO.java</file>
             <file>file:/D:/FPTU/PRJ301/StudentManagement/src/java/DAO/CourseDAO.java</file>
+            <file>file:/D:/FPTU/PRJ301/StudentManagement/src/java/Controller/LogoutServlet.java</file>
+            <file>file:/D:/FPTU/PRJ301/StudentManagement/src/java/Controller/RegisterServlet.java</file>
             <file>file:/D:/FPTU/PRJ301/StudentManagement/src/java/Controller/ClassServlet.java</file>
             <file>file:/D:/FPTU/PRJ301/StudentManagement/web/admin/classes/form.jsp</file>
-            <file>file:/D:/FPTU/PRJ301/StudentManagement/src/java/Models/ClassRoom.java</file>
         </group>
     </open-files>
 </project-private>
