@@ -1,4 +1,4 @@
-package Controllers;
+package Controller;
 
 import DAO.ClassDAO;
 import DAO.CourseDAO;
