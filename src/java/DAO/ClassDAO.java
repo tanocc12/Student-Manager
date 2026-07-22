@@ -39,8 +39,7 @@ public class ClassDAO extends DBContext {
                      ORDER BY c.ClassCode
                      """;
 
-        try (PreparedStatement ps = connection.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
 
@@ -156,25 +155,19 @@ public class ClassDAO extends DBContext {
     /*
      * Thêm lớp mới.
      */
-    public boolean insertClass(ClassRoom classRoom) {
+    public boolean insertClass(ClassRoom classroom) {
 
-        String sql = """
-                     INSERT INTO Classes
-                     (
-                         ClassCode,
-                         ClassName,
-                         CourseId,
-                         MajorId
-                     )
-                     VALUES (?, ?, ?, ?)
-                     """;
+        String sql
+                = "INSERT INTO Classes "
+                + "(ClassCode, ClassName, CourseId, MajorId) "
+                + "VALUES (?, ?, ?, ?)";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
 
-            ps.setString(1, classRoom.getClassCode());
-            ps.setString(2, classRoom.getClassName());
-            ps.setInt(3, classRoom.getCourseId());
-            ps.setInt(4, classRoom.getMajorId());
+            ps.setString(1, classroom.getClassCode());
+            ps.setString(2, classroom.getClassName());
+            ps.setInt(3, classroom.getCourseId());
+            ps.setInt(4, classroom.getMajorId());
 
             return ps.executeUpdate() > 0;
 
