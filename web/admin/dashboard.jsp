@@ -181,7 +181,7 @@
 
                 <a
                     class="btn btn-teal btn-sm"
-                    href="${pageContext.request.contextPath}/EnrollmentServlet?action=list"
+                    href="${pageContext.request.contextPath}/StudentCourseServlet"
                 >
                     Mở
                 </a>

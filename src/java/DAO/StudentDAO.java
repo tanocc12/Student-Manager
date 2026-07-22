@@ -106,8 +106,7 @@ public class StudentDAO extends DBContext {
                 + "ORDER BY s.Id DESC";
 
         try (PreparedStatement ps
-                = connection.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+                = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 students.add(mapStudent(rs));
@@ -217,12 +216,33 @@ public class StudentDAO extends DBContext {
         return null;
     }
 
-    /*
-     * Lấy Student theo Users.Id.
-     *
-     * Dùng khi Student đăng nhập và muốn
-     * xem hồ sơ của chính mình.
-     */
+    public boolean checkStudentId(int id) {
+
+        String sql
+                = "SELECT 1 "
+                + "FROM Students "
+                + "WHERE Id = ?";
+
+        try (PreparedStatement ps
+                = connection.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+
+        } catch (SQLException e) {
+            System.out.println(
+                    "checkStudentId error: "
+                    + e.getMessage()
+            );
+            e.printStackTrace();
+
+            return false;
+        }
+    }
+
     public Student getStudentByUserId(int userId) {
 
         String sql = SELECT_STUDENT
