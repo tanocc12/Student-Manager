@@ -29,7 +29,6 @@ public class RegisterServlet extends HttpServlet {
 
         request.setCharacterEncoding("UTF-8");
 
-        // Lấy dữ liệu từ form
         String username = request.getParameter("username");
         String fullName = request.getParameter("fullName");
         String email = request.getParameter("email");
@@ -42,7 +41,6 @@ public class RegisterServlet extends HttpServlet {
 
         UserDAO dao = new UserDAO();
 
-        // Kiểm tra confirm password
         if (!password.equals(confirmPassword)) {
 
             request.setAttribute("error", "Confirm password does not match.");
@@ -51,7 +49,6 @@ public class RegisterServlet extends HttpServlet {
             return;
         }
 
-        // Kiểm tra username
         if (dao.checkUsername(username)) {
 
             request.setAttribute("error", "Username already exists.");
@@ -60,7 +57,6 @@ public class RegisterServlet extends HttpServlet {
             return;
         }
 
-        // Kiểm tra email
         if (dao.checkEmail(email)) {
 
             request.setAttribute("error", "Email already exists.");
@@ -69,7 +65,6 @@ public class RegisterServlet extends HttpServlet {
             return;
         }
 
-        // Tạo User
         User user = new User();
 
         user.setUsername(username);
@@ -80,12 +75,10 @@ public class RegisterServlet extends HttpServlet {
         user.setPassword(password);
         user.setRole(role);
 
-        // Chuyển String -> java.sql.Date
         if (dob != null && !dob.isEmpty()) {
             user.setDob(Date.valueOf(dob));
         }
 
-        // Đăng ký
         if (dao.register(user)) {
 
             response.sendRedirect(request.getContextPath() + "/login.jsp");

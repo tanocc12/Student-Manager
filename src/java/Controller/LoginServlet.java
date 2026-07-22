@@ -46,12 +46,10 @@ public class LoginServlet extends HttpServlet {
             return;
         }
 
-        // Lưu user vào Session
         HttpSession session = request.getSession();
 
         session.setAttribute("user", user);
 
-        // Phân quyền
         switch (user.getRole()) {
 
             case "Admin":

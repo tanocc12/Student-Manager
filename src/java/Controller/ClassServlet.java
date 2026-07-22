@@ -403,9 +403,7 @@ public class ClassServlet extends HttpServlet {
         redirectToList(request, response);
     }
 
-    /*
-     * Xóa lớp học.
-     */
+
     private void deleteClass(
             HttpServletRequest request,
             HttpServletResponse response)
