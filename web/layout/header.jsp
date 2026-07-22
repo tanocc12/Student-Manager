@@ -29,13 +29,13 @@
                         <a class="nav-link" href="${pageContext.request.contextPath}/admin/dashboard.jsp">Dashboard</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="${pageContext.request.contextPath}/admin/students/list.jsp">Học sinh</a>
+                        <a class="nav-link" href="${pageContext.request.contextPath}/StudentServlet?action=list">Học sinh</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="${pageContext.request.contextPath}/admin/courses/list.jsp">Khóa học</a>
+                        <a class="nav-link" href="${pageContext.request.contextPath}/course?action=list">Khóa học</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="${pageContext.request.contextPath}/admin/classes/list.jsp">Lớp học</a>
+                        <a class="nav-link" href="${pageContext.request.contextPath}/ClassServlet?action=list">Lớp học</a>
                     </li>
                 </c:if>
 
