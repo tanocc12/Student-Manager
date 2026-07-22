@@ -519,9 +519,6 @@ public class ClassServlet extends HttpServlet {
         return null;
     }
 
-    /*
-     * Gửi lại form khi validation thất bại.
-     */
     private void forwardFormError(
             HttpServletRequest request,
             HttpServletResponse response,
@@ -541,9 +538,6 @@ public class ClassServlet extends HttpServlet {
         ).forward(request, response);
     }
 
-    /*
-     * Load dữ liệu cho dropdown chuyên ngành và môn học.
-     */
     private void loadFormData(HttpServletRequest request) {
 
         request.setAttribute(
@@ -557,9 +551,6 @@ public class ClassServlet extends HttpServlet {
         );
     }
 
-    /*
-     * Lấy parameter String và loại bỏ khoảng trắng.
-     */
     private String getTrimmedParameter(
             HttpServletRequest request,
             String parameterName) {
@@ -575,9 +566,6 @@ public class ClassServlet extends HttpServlet {
         return value.trim();
     }
 
-    /*
-     * Parse số nguyên dương.
-     */
     private Integer parsePositiveInt(String value) {
 
         if (value == null || value.trim().isEmpty()) {

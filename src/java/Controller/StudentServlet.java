@@ -101,9 +101,6 @@ public class StudentServlet extends HttpServlet {
         }
     }
 
-    /*
-     * Hiển thị toàn bộ danh sách Student.
-     */
     private void listStudents(
             HttpServletRequest request,
             HttpServletResponse response)
@@ -122,9 +119,6 @@ public class StudentServlet extends HttpServlet {
                 .forward(request, response);
     }
 
-    /*
-     * Tìm kiếm Student.
-     */
     private void searchStudents(
             HttpServletRequest request,
             HttpServletResponse response)
@@ -147,13 +141,6 @@ public class StudentServlet extends HttpServlet {
                 .forward(request, response);
     }
 
-    /*
-     * Mở form tạo hồ sơ Student.
-     *
-     * availableUsers:
-     * Danh sách tài khoản có Role Student
-     * và chưa có hồ sơ trong bảng Students.
-     */
     private void showCreateForm(
             HttpServletRequest request,
             HttpServletResponse response)
@@ -167,9 +154,6 @@ public class StudentServlet extends HttpServlet {
                 .forward(request, response);
     }
 
-    /*
-     * Mở form cập nhật Student.
-     */
     private void showEditForm(
             HttpServletRequest request,
             HttpServletResponse response)
@@ -223,14 +207,6 @@ public class StudentServlet extends HttpServlet {
         }
     }
 
-    /*
-     * Thêm hồ sơ Student.
-     *
-     * Không tạo Users.
-     * Không nhập password.
-     *
-     * User đã được tạo từ Register trước đó.
-     */
     private void insertStudent(
             HttpServletRequest request,
             HttpServletResponse response)
@@ -257,9 +233,6 @@ public class StudentServlet extends HttpServlet {
 
         StudentDAO studentDAO = new StudentDAO();
 
-        /*
-         * Kiểm tra mã Student đã tồn tại.
-         */
         if (studentDAO.checkStudentCode(
                 student.getStudentCode())) {
 
@@ -272,11 +245,6 @@ public class StudentServlet extends HttpServlet {
             return;
         }
 
-        /*
-         * Kiểm tra tài khoản có phải:
-         * - Role Student
-         * - Chưa có hồ sơ Student
-         */
         if (!studentDAO.checkAvailableStudentUser(
                 student.getUserId())) {
 
@@ -289,9 +257,6 @@ public class StudentServlet extends HttpServlet {
             return;
         }
 
-        /*
-         * Kiểm tra Major tồn tại.
-         */
         MajorDAO majorDAO = new MajorDAO();
 
         if (!majorDAO.checkMajorId(
@@ -306,9 +271,6 @@ public class StudentServlet extends HttpServlet {
             return;
         }
 
-        /*
-         * Kiểm tra Class tồn tại.
-         */
         ClassDAO classDAO = new ClassDAO();
 
         if (!classDAO.checkClassId(
@@ -323,9 +285,6 @@ public class StudentServlet extends HttpServlet {
             return;
         }
 
-        /*
-         * Kiểm tra Class thuộc Major.
-         */
         if (!classDAO.checkClassBelongsToMajor(
                 student.getClassId(),
                 student.getMajorId())) {
@@ -362,11 +321,6 @@ public class StudentServlet extends HttpServlet {
         }
     }
 
-    /*
-     * Cập nhật hồ sơ Student.
-     *
-     * Không cập nhật username, email hoặc password.
-     */
     private void updateStudent(
             HttpServletRequest request,
             HttpServletResponse response)
@@ -409,18 +363,10 @@ public class StudentServlet extends HttpServlet {
             return;
         }
 
-        /*
-         * Không lấy UserId từ form khi update.
-         * Giữ UserId thật đang có trong database.
-         */
         student.setUserId(
                 oldStudent.getUserId()
         );
 
-        /*
-         * Giữ thông tin User để khi forward lại
-         * form vẫn có thể hiển thị.
-         */
         student.setUsername(
                 oldStudent.getUsername()
         );
@@ -444,10 +390,7 @@ public class StudentServlet extends HttpServlet {
         student.setPhone(
                 oldStudent.getPhone()
         );
-
-        /*
-         * Kiểm tra StudentCode trùng với Student khác.
-         */
+        
         if (studentDAO.checkStudentCodeExceptId(
                 student.getStudentCode(),
                 student.getId())) {
@@ -524,12 +467,6 @@ public class StudentServlet extends HttpServlet {
         redirectToList(request, response);
     }
 
-    /*
-     * Xóa hồ sơ Student.
-     *
-     * StudentDAO mới chỉ xóa hồ sơ Student,
-     * không xóa tài khoản Users.
-     */
     private void deleteStudent(
             HttpServletRequest request,
             HttpServletResponse response)
@@ -577,16 +514,6 @@ public class StudentServlet extends HttpServlet {
         redirectToList(request, response);
     }
 
-    /*
-     * Đọc dữ liệu Student từ form.
-     *
-     * Khi create:
-     * - Đọc userId.
-     *
-     * Khi update:
-     * - Đọc id.
-     * - Không đọc userId từ form.
-     */
     private Student getStudentFromRequest(
             HttpServletRequest request,
             boolean isUpdate) {
@@ -621,9 +548,6 @@ public class StudentServlet extends HttpServlet {
             }
         }
 
-        /*
-         * Create cần chọn User đã đăng ký.
-         */
         if (!isUpdate) {
 
             String userIdRaw
@@ -680,9 +604,6 @@ public class StudentServlet extends HttpServlet {
                         "status"
                 );
 
-        /*
-         * Validate StudentCode.
-         */
         if (studentCode.isEmpty()) {
 
             throw new IllegalArgumentException(
@@ -690,9 +611,7 @@ public class StudentServlet extends HttpServlet {
             );
         }
 
-        /*
-         * Validate ClassId.
-         */
+
         int classId;
 
         try {
@@ -709,9 +628,6 @@ public class StudentServlet extends HttpServlet {
             );
         }
 
-        /*
-         * Validate MajorId.
-         */
         int majorId;
 
         try {
@@ -728,9 +644,6 @@ public class StudentServlet extends HttpServlet {
             );
         }
 
-        /*
-         * Validate Status.
-         */
         if (!status.equals("Studying")
                 && !status.equals("Graduated")
                 && !status.equals("Dropped")) {
@@ -755,9 +668,6 @@ public class StudentServlet extends HttpServlet {
         return student;
     }
 
-    /*
-     * Forward lại form create khi có lỗi.
-     */
     private void forwardCreateError(
             HttpServletRequest request,
             HttpServletResponse response,
@@ -775,9 +685,6 @@ public class StudentServlet extends HttpServlet {
                 .forward(request, response);
     }
 
-    /*
-     * Forward lại form update khi có lỗi.
-     */
     private void forwardUpdateError(
             HttpServletRequest request,
             HttpServletResponse response,
@@ -795,9 +702,6 @@ public class StudentServlet extends HttpServlet {
                 .forward(request, response);
     }
 
-    /*
-     * Load dữ liệu cho form create.
-     */
     private void loadCreateFormData(
             HttpServletRequest request) {
 
@@ -821,12 +725,6 @@ public class StudentServlet extends HttpServlet {
         );
     }
 
-    /*
-     * Load dữ liệu cho form update.
-     *
-     * Update không cần danh sách availableUsers
-     * vì không được đổi tài khoản của Student.
-     */
     private void loadUpdateFormData(
             HttpServletRequest request) {
 
@@ -844,9 +742,6 @@ public class StudentServlet extends HttpServlet {
         );
     }
 
-    /*
-     * Lấy parameter và xóa khoảng trắng hai đầu.
-     */
     private String getTrimmedParameter(
             HttpServletRequest request,
             String parameterName) {
@@ -859,9 +754,6 @@ public class StudentServlet extends HttpServlet {
                 : value.trim();
     }
 
-    /*
-     * Lưu thông báo thành công vào session.
-     */
     private void setFlashSuccess(
             HttpServletRequest request,
             String message) {
@@ -872,9 +764,6 @@ public class StudentServlet extends HttpServlet {
         );
     }
 
-    /*
-     * Lưu thông báo lỗi vào session.
-     */
     private void setFlashError(
             HttpServletRequest request,
             String message) {
@@ -885,10 +774,6 @@ public class StudentServlet extends HttpServlet {
         );
     }
 
-    /*
-     * Chuyển flash message từ session
-     * sang request rồi xóa khỏi session.
-     */
     private void loadFlashMessage(
             HttpServletRequest request) {
 
@@ -934,9 +819,6 @@ public class StudentServlet extends HttpServlet {
         }
     }
 
-    /*
-     * Redirect về trang danh sách.
-     */
     private void redirectToList(
             HttpServletRequest request,
             HttpServletResponse response)
