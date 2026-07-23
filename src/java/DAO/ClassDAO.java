@@ -369,4 +369,62 @@ public class ClassDAO extends DBContext {
 
         return classRoom;
     }
+
+    public List<ClassRoom> getClasses() {
+
+        List<ClassRoom> list = new ArrayList<>();
+
+        String sql = """
+        SELECT
+            c.Id,
+            c.ClassCode,
+            c.ClassName,
+            c.CourseId,
+            co.CourseCode,
+            co.CourseName,
+            c.MajorId,
+            m.MajorCode,
+            m.MajorName
+        FROM Classes c
+
+        INNER JOIN Courses co
+            ON c.CourseId = co.Id
+
+        INNER JOIN Majors m
+            ON c.MajorId = m.Id
+
+        ORDER BY c.Id
+    """;
+
+        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+
+                list.add(mapResultSetToClassRoom(rs));
+
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    private ClassRoom mapResultSetToClassRoom(ResultSet rs)
+            throws SQLException {
+
+        return new ClassRoom(
+                rs.getInt("Id"),
+                rs.getString("ClassCode"),
+                rs.getString("ClassName"),
+                rs.getInt("CourseId"),
+                rs.getString("CourseCode"),
+                rs.getString("CourseName"),
+                rs.getInt("MajorId"),
+                rs.getString("MajorCode"),
+                rs.getString("MajorName")
+        );
+
+    }
 }

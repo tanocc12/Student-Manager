@@ -189,6 +189,30 @@
             </div>
         </div>
     </div>
+                
+    <!-- Enrollment -->
+    <div class="col-md-6 col-lg-4">
+        <div class="card menu-card">
+            <div class="card-body">
+
+                <h5 class="card-title">
+                    Phân công giảng dạy
+                </h5>
+
+                <p class="text-muted mb-3">
+                    Phân công giáo viên vào lớp hoặc khóa học.
+                </p>
+
+                <a
+                    class="btn btn-teal btn-sm"
+                    href="${pageContext.request.contextPath}/assignment"
+                >
+                    Mở
+                </a>
+
+            </div>
+        </div>
+    </div>
 
 </div>
 
