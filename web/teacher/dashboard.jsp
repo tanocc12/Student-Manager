@@ -1,30 +1,65 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@taglib prefix="c" uri="jakarta.tags.core" %>
+<%@taglib prefix="c" uri="jakarta.tags.core"%>
+
 <jsp:include page="/layout/header.jsp">
     <jsp:param name="pageTitle" value="Teacher Dashboard | Student Manager"/>
 </jsp:include>
 
-<h2 class="page-title">Teacher Dashboard</h2>
-<p class="page-subtitle">Quản lý lớp phụ trách và điểm số học sinh.</p>
-<div class="row g-3">
-    <div class="col-md-6">
-        <div class="card menu-card">
-            <div class="card-body">
-                <h5 class="card-title">Lớp của tôi</h5>
-                <p class="text-muted mb-3">Danh sách lớp đang giảng dạy.</p>
-                <a class="btn btn-teal btn-sm" href="${pageContext.request.contextPath}/teacher/classes.jsp">Xem lớp</a>
+<div class="container-fluid">
+
+    <h2 class="page-title">Teacher Dashboard</h2>
+    <p class="page-subtitle">
+        Manage your classes and student grades.
+    </p>
+
+    <div class="row g-4">
+
+        <!-- My Classes -->
+        <div class="col-md-6">
+            <div class="card menu-card h-100">
+                <div class="card-body d-flex flex-column">
+
+                    <h5 class="card-title">
+                        My Classes
+                    </h5>
+
+                    <p class="text-muted flex-grow-1">
+                        View all classes assigned to you.
+                    </p>
+
+                    <a class="btn btn-teal"
+                       href="${pageContext.request.contextPath}/TeacherAssignmentServlet">
+                        View Classes
+                    </a>
+
+                </div>
             </div>
         </div>
-    </div>
-    <div class="col-md-6">
-        <div class="card menu-card">
-            <div class="card-body">
-                <h5 class="card-title">Nhập / sửa điểm</h5>
-                <p class="text-muted mb-3">Cập nhật điểm cho học sinh trong lớp.</p>
-                <a class="btn btn-teal btn-sm" href="${pageContext.request.contextPath}/teacher/grades.jsp">Nhập điểm</a>
+
+        <!-- Grade Management -->
+        <div class="col-md-6">
+            <div class="card menu-card h-100">
+                <div class="card-body d-flex flex-column">
+
+                    <h5 class="card-title">
+                        Grade Management
+                    </h5>
+
+                    <p class="text-muted flex-grow-1">
+                        Enter and update student grades.
+                    </p>
+
+                    <a class="btn btn-teal"
+                       href="${pageContext.request.contextPath}/GradeServlet">
+                        Manage Grades
+                    </a>
+
+                </div>
             </div>
         </div>
+
     </div>
+
 </div>
 
 <jsp:include page="/layout/footer.jsp"/>

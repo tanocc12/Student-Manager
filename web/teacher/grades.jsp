@@ -1,93 +1,269 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@taglib prefix="c" uri="jakarta.tags.core"%>
+
 <jsp:include page="/layout/header.jsp">
-    <jsp:param name="pageTitle" value="Nhập điểm | Student Manager"/>
+    <jsp:param name="pageTitle"
+               value="Grade Management | Student Manager"/>
 </jsp:include>
 
-<h2 class="page-title">Nhập / sửa điểm</h2>
-<p class="page-subtitle">Cập nhật điểm học sinh theo lớp.</p>
+<h2 class="page-title">Grade Management</h2>
 
-<% if (request.getAttribute("success") != null) { %>
-<div class="alert alert-success"><%= request.getAttribute("success") %></div>
-<% } %>
+<p class="page-subtitle">
+    Enter and update grades for students in your assigned classes.
+</p>
 
-<div class="card table-card mb-3">
+<!-- Success message -->
+<c:if test="${not empty sessionScope.success}">
+    <div class="alert alert-success alert-dismissible fade show"
+         role="alert">
+
+        ${sessionScope.success}
+
+        <button type="button"
+                class="btn-close"
+                data-bs-dismiss="alert">
+        </button>
+    </div>
+
+    <c:remove var="success" scope="session"/>
+</c:if>
+
+<!-- Error message -->
+<c:if test="${not empty sessionScope.error}">
+    <div class="alert alert-danger alert-dismissible fade show"
+         role="alert">
+
+        ${sessionScope.error}
+
+        <button type="button"
+                class="btn-close"
+                data-bs-dismiss="alert">
+        </button>
+    </div>
+
+    <c:remove var="error" scope="session"/>
+</c:if>
+
+<!-- Select teaching assignment -->
+<div class="card table-card mb-4">
     <div class="card-body">
-        <form class="row g-2" method="get" action="${pageContext.request.contextPath}/GradeServlet">
-            <div class="col-md-8">
-                <select class="form-select" name="classId">
-                    <option value="">-- Chọn lớp --</option>
-                    <option value="1" ${param.classId == '1' ? 'selected' : ''}>SE1801 - PRJ301 (mẫu)</option>
-                    <option value="2" ${param.classId == '2' ? 'selected' : ''}>SE1802 - DBI202 (mẫu)</option>
+
+        <form method="get"
+              action="${pageContext.request.contextPath}/GradeServlet"
+              class="row g-3 align-items-end">
+
+            <input type="hidden"
+                   name="action"
+                   value="list"/>
+
+            <div class="col-md-9">
+
+                <label for="teachingAssignmentId"
+                       class="form-label">
+                    Assigned class
+                </label>
+
+                <select id="teachingAssignmentId"
+                        name="teachingAssignmentId"
+                        class="form-select"
+                        required>
+
+                    <option value="">
+                        -- Select assigned class --
+                    </option>
+
+                    <c:forEach var="assignment"
+                               items="${teachingAssignmentList}">
+
+                        <option value="${assignment.id}"
+                            ${selectedTeachingAssignmentId == assignment.id
+                              ? 'selected' : ''}>
+
+                            ${assignment.classCode}
+                            -
+                            ${assignment.courseCode}
+                            -
+                            ${assignment.semesterName}
+                            ${assignment.schoolYear}
+
+                        </option>
+
+                    </c:forEach>
+
                 </select>
+
+                <c:if test="${empty teachingAssignmentList}">
+                    <div class="text-danger small mt-2">
+                        You have not been assigned to any classes.
+                    </div>
+                </c:if>
+
             </div>
-            <div class="col-md-4">
-                <button type="submit" class="btn btn-outline-secondary w-100">Lọc</button>
+
+            <div class="col-md-3">
+                <button type="submit"
+                        class="btn btn-outline-secondary w-100"
+                        ${empty teachingAssignmentList ? 'disabled' : ''}>
+
+                    View students
+                </button>
             </div>
+
         </form>
+
     </div>
 </div>
 
-<form method="post" action="${pageContext.request.contextPath}/GradeServlet">
-    <input type="hidden" name="action" value="save">
-    <input type="hidden" name="classId" value="${param.classId}">
+<!-- Grade form -->
+<c:if test="${not empty selectedTeachingAssignmentId}">
 
-    <div class="card table-card">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th>Mã SV</th>
-                        <th>Họ tên</th>
-                        <th style="width:140px">Điểm giữa kỳ</th>
-                        <th style="width:140px">Điểm cuối kỳ</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <c:choose>
-                        <c:when test="${not empty gradeList}">
-                            <c:forEach var="g" items="${gradeList}">
+    <form method="post"
+          action="${pageContext.request.contextPath}/GradeServlet">
+
+        <input type="hidden"
+               name="action"
+               value="save"/>
+
+        <input type="hidden"
+               name="teachingAssignmentId"
+               value="${selectedTeachingAssignmentId}"/>
+
+        <div class="card table-card">
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle mb-0">
+
+                    <thead class="table-light">
+                        <tr>
+                            <th>Student code</th>
+                            <th>Full name</th>
+
+                            <th style="width: 145px;">
+                                Assignment
+                            </th>
+
+                            <th style="width: 145px;">
+                                Practical exam
+                            </th>
+
+                            <th style="width: 145px;">
+                                Final exam
+                            </th>
+
+                            <th style="width: 120px;">
+                                Average
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        <c:choose>
+
+                            <c:when test="${not empty gradeList}">
+
+                                <c:forEach var="grade"
+                                           items="${gradeList}">
+
+                                    <tr>
+
+                                        <td>
+                                            ${grade.studentCode}
+                                        </td>
+
+                                        <td>
+                                            ${grade.studentName}
+                                        </td>
+
+                                        <td>
+                                            <input type="number"
+                                                   class="form-control"
+                                                   name="assignment_${grade.studentCourseId}"
+                                                   value="${grade.assignment}"
+                                                   min="0"
+                                                   max="10"
+                                                   step="0.01"
+                                                   required/>
+                                        </td>
+
+                                        <td>
+                                            <input type="number"
+                                                   class="form-control"
+                                                   name="practicalExam_${grade.studentCourseId}"
+                                                   value="${grade.practicalExam}"
+                                                   min="0"
+                                                   max="10"
+                                                   step="0.01"
+                                                   required/>
+                                        </td>
+
+                                        <td>
+                                            <input type="number"
+                                                   class="form-control"
+                                                   name="finalExam_${grade.studentCourseId}"
+                                                   value="${grade.finalExam}"
+                                                   min="0"
+                                                   max="10"
+                                                   step="0.01"
+                                                   required/>
+                                        </td>
+
+                                        <td>
+                                            <input type="text"
+                                                   class="form-control"
+                                                   value="${grade.average}"
+                                                   readonly/>
+                                        </td>
+
+                                    </tr>
+
+                                </c:forEach>
+
+                            </c:when>
+
+                            <c:otherwise>
+
                                 <tr>
-                                    <td>${g.studentCode}</td>
-                                    <td>${g.studentName}</td>
-                                    <td>
-                                        <input type="number" step="0.1" min="0" max="10" class="form-control"
-                                               name="midterm_${g.studentId}" value="${g.midterm}">
-                                    </td>
-                                    <td>
-                                        <input type="number" step="0.1" min="0" max="10" class="form-control"
-                                               name="final_${g.studentId}" value="${g.finalScore}">
+                                    <td colspan="6"
+                                        class="text-center text-muted py-4">
+
+                                        No students are enrolled in this class.
+
                                     </td>
                                 </tr>
-                            </c:forEach>
-                        </c:when>
-                        <c:otherwise>
-                            <tr>
-                                <td>SV001</td>
-                                <td>Nguyễn Văn A</td>
-                                <td><input type="number" step="0.1" min="0" max="10" class="form-control" name="midterm_1" value="7.5"></td>
-                                <td><input type="number" step="0.1" min="0" max="10" class="form-control" name="final_1" value="8.0"></td>
-                            </tr>
-                            <tr>
-                                <td>SV002</td>
-                                <td>Trần Thị B</td>
-                                <td><input type="number" step="0.1" min="0" max="10" class="form-control" name="midterm_2" value="8.0"></td>
-                                <td><input type="number" step="0.1" min="0" max="10" class="form-control" name="final_2" value="8.5"></td>
-                            </tr>
-                            <tr>
-                                <td colspan="4" class="text-muted small">* Dữ liệu mẫu UI. Backend set <code>gradeList</code>.</td>
-                            </tr>
-                        </c:otherwise>
-                    </c:choose>
-                </tbody>
-            </table>
-        </div>
-    </div>
 
-    <div class="mt-3">
-        <button type="submit" class="btn btn-teal">Lưu điểm</button>
-        <a class="btn btn-outline-secondary" href="${pageContext.request.contextPath}/teacher/classes.jsp">Quay lại</a>
-    </div>
-</form>
+                            </c:otherwise>
+
+                        </c:choose>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+        <div class="mt-3 d-flex gap-2">
+
+            <button type="submit"
+                    class="btn btn-teal"
+                    ${empty gradeList ? 'disabled' : ''}>
+
+                Save grades
+            </button>
+
+            <a class="btn btn-outline-secondary"
+               href="${pageContext.request.contextPath}/TeacherAssignmentServlet">
+
+                Back to my classes
+            </a>
+
+        </div>
+
+    </form>
+
+</c:if>
 
 <jsp:include page="/layout/footer.jsp"/>
