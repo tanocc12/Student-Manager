@@ -59,7 +59,7 @@
                                 <a class="nav-link" href="${pageContext.request.contextPath}/StudentClassServlet">Lớp học</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="${pageContext.request.contextPath}/student/grades.jsp">Điểm của tôi</a>
+                                <a class="nav-link" href="${pageContext.request.contextPath}/StudentGradeServlet">Điểm của tôi</a>
                             </li>
                         </c:if>
                     </ul>
