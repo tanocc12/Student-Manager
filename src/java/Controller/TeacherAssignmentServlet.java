@@ -54,7 +54,7 @@ public class TeacherAssignmentServlet extends HttpServlet {
             List<TeachingAssignment> assignments
                     = dao.getTeachingAssignmentsByTeacherUserId(user.getId());
 
-            request.setAttribute("assignments", assignments);
+            request.setAttribute("myClasses", assignments);
 
             request.getRequestDispatcher(
                     "/teacher/classes.jsp"

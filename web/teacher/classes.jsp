@@ -54,7 +54,6 @@
                     <th>Class name</th>
                     <th>Course</th>
                     <th>Semester</th>
-                    <th>Students</th>
                     <th class="text-end">Action</th>
                 </tr>
             </thead>
@@ -89,14 +88,10 @@
                                     ${cl.schoolYear}
                                 </td>
 
-                                <td>
-                                    ${cl.studentCount}
-                                </td>
-
                                 <td class="text-end">
 
                                     <a class="btn btn-sm btn-teal"
-                                       href="${pageContext.request.contextPath}/GradeServlet?action=list&teachingAssignmentId=${cl.teachingAssignmentId}">
+                                       href="${pageContext.request.contextPath}/GradeServlet?action=list&teachingAssignmentId=${cl.id}">
 
                                         Manage grades
                                     </a>
@@ -112,7 +107,7 @@
                     <c:otherwise>
 
                         <tr>
-                            <td colspan="6"
+                            <td colspan="5"
                                 class="text-center text-muted py-4">
 
                                 You have not been assigned to any classes.
@@ -142,4 +137,4 @@
 
 </div>
 
-<jsp:include page="/layout/footer.jsp"/>  
+<jsp:include page="/layout/footer.jsp"/>
