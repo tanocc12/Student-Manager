@@ -6,7 +6,7 @@ import Models.Grade;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,8 +44,8 @@ public class GradeDAO extends DBContext {
             return gradeList;
         }
 
-        try (PreparedStatement statement =
-                     connection.prepareStatement(sql)) {
+        try (PreparedStatement statement
+                = connection.prepareStatement(sql)) {
 
             statement.setInt(1, teachingAssignmentId);
 
@@ -118,7 +118,6 @@ public class GradeDAO extends DBContext {
         return gradeList;
     }
 
-
     public boolean gradeExists(int studentCourseId) {
 
         String sql = """
@@ -131,8 +130,8 @@ public class GradeDAO extends DBContext {
             return false;
         }
 
-        try (PreparedStatement statement =
-                     connection.prepareStatement(sql)) {
+        try (PreparedStatement statement
+                = connection.prepareStatement(sql)) {
 
             statement.setInt(1, studentCourseId);
 
@@ -146,7 +145,6 @@ public class GradeDAO extends DBContext {
 
         return false;
     }
-
 
     public boolean insertGrade(Grade grade) {
 
@@ -172,8 +170,8 @@ public class GradeDAO extends DBContext {
                 grade.getFinalExam()
         );
 
-        try (PreparedStatement statement =
-                     connection.prepareStatement(sql)) {
+        try (PreparedStatement statement
+                = connection.prepareStatement(sql)) {
 
             statement.setInt(
                     1,
@@ -209,7 +207,6 @@ public class GradeDAO extends DBContext {
         return false;
     }
 
-
     public boolean updateGrade(Grade grade) {
 
         String sql = """
@@ -231,8 +228,8 @@ public class GradeDAO extends DBContext {
                 grade.getFinalExam()
         );
 
-        try (PreparedStatement statement =
-                     connection.prepareStatement(sql)) {
+        try (PreparedStatement statement
+                = connection.prepareStatement(sql)) {
 
             setNullableDouble(
                     statement,
@@ -268,7 +265,6 @@ public class GradeDAO extends DBContext {
         return false;
     }
 
-
     public boolean saveOrUpdateGrade(Grade grade) {
 
         if (gradeExists(grade.getStudentCourseId())) {
@@ -277,7 +273,6 @@ public class GradeDAO extends DBContext {
 
         return insertGrade(grade);
     }
-
 
     public boolean belongsToTeachingAssignment(
             int studentCourseId,
@@ -294,8 +289,8 @@ public class GradeDAO extends DBContext {
             return false;
         }
 
-        try (PreparedStatement statement =
-                     connection.prepareStatement(sql)) {
+        try (PreparedStatement statement
+                = connection.prepareStatement(sql)) {
 
             statement.setInt(1, studentCourseId);
             statement.setInt(2, teachingAssignmentId);
@@ -311,29 +306,27 @@ public class GradeDAO extends DBContext {
         return false;
     }
 
-
     private double calculateAverage(
             Double assignment,
             Double practicalExam,
             Double finalExam) {
 
-        double assignmentValue =
-                assignment == null ? 0 : assignment;
+        double assignmentValue
+                = assignment == null ? 0 : assignment;
 
-        double practicalValue =
-                practicalExam == null ? 0 : practicalExam;
+        double practicalValue
+                = practicalExam == null ? 0 : practicalExam;
 
-        double finalValue =
-                finalExam == null ? 0 : finalExam;
+        double finalValue
+                = finalExam == null ? 0 : finalExam;
 
-        double average =
-                assignmentValue * 0.3
+        double average
+                = assignmentValue * 0.3
                 + practicalValue * 0.3
                 + finalValue * 0.4;
 
         return Math.round(average * 100.0) / 100.0;
     }
-
 
     private Double getNullableDouble(
             ResultSet resultSet,
@@ -348,7 +341,6 @@ public class GradeDAO extends DBContext {
 
         return value;
     }
-
 
     private void setNullableDouble(
             PreparedStatement statement,
@@ -367,5 +359,69 @@ public class GradeDAO extends DBContext {
                     value
             );
         }
+    }
+
+    public ArrayList<Grade> getGradesByStudentUserId(int userId) {
+
+        ArrayList<Grade> list = new ArrayList<>();
+
+        String sql = """
+        SELECT
+            g.Id,
+            g.StudentCourseId,
+            g.Assignment,
+            g.PracticalExam,
+            g.FinalExam,
+            g.Average,
+            co.CourseCode,
+            co.CourseName
+        FROM Grades g
+        INNER JOIN StudentCourses sc
+            ON g.StudentCourseId = sc.Id
+        INNER JOIN Students s
+            ON sc.StudentId = s.Id
+        INNER JOIN Users u
+            ON s.UserId = u.Id
+        INNER JOIN TeachingAssignment ta
+            ON sc.TeachingAssignmentId = ta.Id
+        INNER JOIN Courses co
+            ON ta.CourseId = co.Id
+        WHERE u.Id = ?
+        ORDER BY co.CourseCode
+        """;
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+
+                while (rs.next()) {
+
+                    Grade grade = new Grade();
+
+                    grade.setId(rs.getInt("Id"));
+                    grade.setStudentCourseId(rs.getInt("StudentCourseId"));
+                    BigDecimal assignment = rs.getBigDecimal("Assignment");
+                    BigDecimal practical = rs.getBigDecimal("PracticalExam");
+                    BigDecimal finalExam = rs.getBigDecimal("FinalExam");
+                    BigDecimal average = rs.getBigDecimal("Average");
+
+                    grade.setAssignment(assignment == null ? null : assignment.doubleValue());
+                    grade.setPracticalExam(practical == null ? null : practical.doubleValue());
+                    grade.setFinalExam(finalExam == null ? null : finalExam.doubleValue());
+                    grade.setAverage(average == null ? null : average.doubleValue());
+                    grade.setCourseCode(rs.getString("CourseCode"));
+                    grade.setCourseName(rs.getString("CourseName"));
+
+                    list.add(grade);
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return list;
     }
 }

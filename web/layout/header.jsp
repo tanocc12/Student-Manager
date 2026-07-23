@@ -56,7 +56,7 @@
                                 <a class="nav-link" href="${pageContext.request.contextPath}/student/dashboard.jsp">Dashboard</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="${pageContext.request.contextPath}/student/courses.jsp">Khóa học</a>
+                                <a class="nav-link" href="${pageContext.request.contextPath}/StudentClassServlet">Lớp học</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="${pageContext.request.contextPath}/student/grades.jsp">Điểm của tôi</a>

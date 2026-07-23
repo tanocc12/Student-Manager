@@ -72,8 +72,7 @@ public class StudentCourseDAO extends DBContext {
             ORDER BY sc.Id DESC
         """;
 
-        try (PreparedStatement ps = connection.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
 

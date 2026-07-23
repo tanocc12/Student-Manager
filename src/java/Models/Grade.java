@@ -14,6 +14,9 @@ public class Grade {
     private Double finalExam;
     private Double average;
 
+    private String courseCode;
+    private String courseName;
+
     public Grade() {
     }
 
@@ -109,5 +112,21 @@ public class Grade {
 
     public void setAverage(Double average) {
         this.average = average;
+    }
+
+    public String getCourseCode() {
+        return courseCode;
+    }
+
+    public void setCourseCode(String courseCode) {
+        this.courseCode = courseCode;
+    }
+
+    public String getCourseName() {
+        return courseName;
+    }
+
+    public void setCourseName(String courseName) {
+        this.courseName = courseName;
     }
 }
